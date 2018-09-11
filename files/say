@@ -1,3 +1,5 @@
 say datex multiple value has error itself.
 say it works though
 set timezone if time is wrong
+
+support for year+month but day+year

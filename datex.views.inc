@@ -24,10 +24,6 @@ function datex_views_data_alter(&$data) {
       datex_views_data_alter($value);
     }
 
-    if (substr($key, 0, strlen('date_views')) === 'date_views') {
-      dpm($value, $key);
-    }
-
     $change = [
       'views_handler_field_date',
       'views_handler_filter_date',

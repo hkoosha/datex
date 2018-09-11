@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PhpIncludePathManager">
+    <include_path>
+      <path value="$PROJECT_DIR$/../../../../includes" />
+      <path value="$PROJECT_DIR$/../../../../modules" />
+      <path value="$PROJECT_DIR$/../date" />
+      <path value="$PROJECT_DIR$/../devel" />
+      <path value="$PROJECT_DIR$/../views" />
+      <path value="$PROJECT_DIR$/../ctools" />
+      <path value="$PROJECT_DIR$/../entity" />
+      <path value="$PROJECT_DIR$/../profile2" />
+      <path value="$PROJECT_DIR$/../admin_menu" />
+      <path value="$PROJECT_DIR$/../entityspice" />
+      <path value="$PROJECT_DIR$/../calendar_systems" />
+    </include_path>
+  </component>
+</project>

@@ -13,15 +13,21 @@ define('DATEX_HIDDEN_VALUE_FMT', 'Y-n-j');
  * If month is present, Then it's supported. But if month is not present then
  * none of smaller granularities should be present either, Otherwise it's
  * impossible to calculate correct date, Since date module sets month to 1.
+ *
+ * it's still possible to support it. But I'm really tired to do so, and who
+ * wants year and day, without month?!
  */
-// TODO it's still possible to support it. But I'm really tired to do so.
-function _datex_date_granularities_supported($g) {
+function _datex_date_granularity_supported($g) {
   if (is_string($g)) {
     return in_array($g, ['year', 'month']);
   }
-  return count($g) === 0 || (count($g) === 1 && in_array('year', $g)) || in_array('month', $g);
+  // Year is always there.
+  return count($g) < 2 || in_array('month', $g);
 }
 
+/**
+ * Extract granularity from element (probably a form element).
+ */
 function _datex_field_granularity($element, $is_popup = FALSE) {
   if (isset($element['#granularity'])) {
     return $element['#granularity'];
@@ -46,22 +52,33 @@ function _datex_field_granularity($element, $is_popup = FALSE) {
   }
 }
 
+/**
+ * Find the datex schema set for a field, or the global schema of none is set.
+ */
 function _datex_field_schema($e) {
-  if (isset($e['#instance']['widget']['settings']['datex_schema'])) {
-    return $e['#instance']['widget']['settings']['datex_schema'];
+  $ret = NULL;
+  if (isset($elementp['#instance']['settings']['datex_schema'])) {
+    $ret = $element['#instance']['settings']['datex_schema'];
+  }
+  elseif (isset($e['#instance']['widget']['settings']['datex_schema'])) {
+    $ret = $e['#instance']['widget']['settings']['datex_schema'];
   }
   elseif (isset($e['display']['settings']['datex_schema'])) {
-    return $e['display']['settings']['datex_schema'];
+    $ret = $e['display']['settings']['datex_schema'];
   }
   elseif (isset($e['view_mode']) &&
     $e['instance']['display'][$e['view_mode']]['settings']['datex_schema']) {
-    return $e['instance']['display'][$e['view_mode']]['settings']['datex_schema'];
+    $ret = $e['instance']['display'][$e['view_mode']]['settings']['datex_schema'];
   }
   else {
-    return 'default';
+    $ret = 'default';
   }
+  return $ret ? $ret : 'default';
 }
 
+/**
+ * Create a datex-calendar based on field config and the schema set for it.
+ */
 function _datex_field_calendar($element, $is_popup = FALSE) {
   $schema = _datex_field_schema($element);
   if ($schema === 'disabled') {
@@ -69,7 +86,7 @@ function _datex_field_calendar($element, $is_popup = FALSE) {
   }
 
   list($date_granule, $time_granule) = _datex_field_granularity($element, $is_popup);
-  if (!_datex_date_granularities_supported($date_granule)) {
+  if (!_datex_date_granularity_supported($date_granule)) {
     return NULL;
   }
 
@@ -77,76 +94,7 @@ function _datex_field_calendar($element, $is_popup = FALSE) {
   return datex_factory($tz, _datex_language_calendar($schema));
 }
 
-function _datex_set_calendar_time_from_field_default_value($element, DatexInterface $calendar) {
-  $d = date_default_date($element);
-  if ($d) {
-    $calendar->setTimestamp($d->getTimestamp());
-  }
-}
-
-function _datex_dpm($element, $fs, $name = NULL, $type = 'popup') {
-  if (!user_access('access devel information')) {
-    return;
-  }
-
-  $dr = ddebug_backtrace(TRUE);
-  if (is_array($dr)) {
-    array_shift($dr);
-    if (count($dr)) {
-      $dr = array_shift($dr)['file'];
-      if ($dr && isset($dr['file'])) {
-        $dr = $dr['file'];
-      }
-    }
-  }
-  if (!is_string($dr)) {
-    $dr = 'file?:line?';
-  }
-  $name = $name . ' => ' . $dr;
-
-  $dummy = NULL;
-  $input = $fs === NULL ? '?' : _datex_get_fs($element, $fs, NULL, TRUE);
-  $value = $fs === NULL ? '?' : _datex_get_fs($element, $fs, NULL, FALSE);
-
-  $def_obj = date_default_date($element);
-  $def_str = $element['#default_value'];
-  $def_obp = datex_factory(NULL, 'persian');
-  _datex_set_calendar_time_from_field_default_value($element, $def_obp);
-  $def_obp = $def_obj
-    ? $def_obp->setTimestamp($def_obj->getTimestamp())->format('Y-m-d H:i:s')
-    : '?';
-
-  switch ($type) {
-    case 'popup':
-      $date_fmt = date_popup_date_format($element);
-      $granule = date_popup_date_granularity($element);
-      break;
-
-    default:
-      $date_fmt = '?';
-      $granule = '?';
-      break;
-  }
-
-  dpm([
-    "['#default_value']" => $def_str,
-    "['#default_value']P" => $def_obp,
-    "['#default_value']obj" => $def_obj,
-    "['#value']" => $element['#value'],
-    "date['#default_value']" => $element['date']['#default_value'],
-    "date['#value']" => $element['date']['#value'],
-    'date_format' => $date_fmt,
-    'granule' => implode(', ', $granule),
-    'input' => $input,
-    'value' => $value,
-    'el' => $element,
-    "fs['values']" => $fs === NULL ? '?' : $fs['values'],
-    "fs['input']" => $fs === NULL ? '?' : $fs['input'],
-    "fs" => $fs,
-  ], $name);
-}
-
-function _datex_fix_missing_granularity($calendar, DateObject $dt, $g) {
+function _datex_fix_missing_granularity($calendar, DateObject $dt, array $g) {
   switch ($calendar) {
     case 'persian':
       $missing_month_default = 2;
@@ -169,7 +117,7 @@ function _datex_fix_missing_granularity($calendar, DateObject $dt, $g) {
   }
 }
 
-function _datex_fix_missing_granularity_locale(DatexInterface $calendar, $g) {
+function _datex_fix_missing_granularity_locale(DatexInterface $calendar, array $g) {
   switch ($calendar) {
     case 'persian':
       $missing_month_default = 3;
@@ -227,26 +175,27 @@ function _datex_set_fs(&$element, &$fs, $value, $extra_parent = NULL, $is_input 
 
 // ____________________________________________________________________________
 
+/**
+ * To convert the day back to Gregorian.
+ */
 function _datex_select_date_field_element_validate_callback(&$element, &$fs) {
   if (empty($element['#value']) || empty($element['#value']['year'])) {
     return;
   }
 
-  $schema = isset($element['#instance']['settings']['datex_schema']) ?
-    isset($element['#instance']['settings']['datex_schema']) : 'default';
-  if (!$schema || $schema === 'disabled') {
+  if (_datex_field_schema($element) === 'disabled') {
     return;
   }
 
   $tz = isset($element['#date_timezone']) ? $element['#date_timezone'] : NULL;
-  $calendar = datex_factory($tz, _datex_language_calendar($schema));
+  $calendar = datex_factory($tz, _datex_language_calendar(_datex_field_schema($element)));
   if (!$calendar) {
     return;
   }
 
+  $is_view = isset($fs['view']);
   $fval = _datex_get_fs($element, $fs);
   if ($fval) {
-    dpm($fval);
     $calendar->setDateLocale(
       $fval['year'],
       isset($fval['month']) ? $fval['month'] : 1,
@@ -257,6 +206,12 @@ function _datex_select_date_field_element_validate_callback(&$element, &$fs) {
       isset($fval['minute']) ? $fval['minute'] : 0,
       isset($fval['second']) ? $fval['second'] : 0
     );
+
+    if ($is_view &&
+      in_array('month', $element['#granularity'], TRUE) &&
+      !in_array('day', $element['#granularity'])) {
+      $calendar->setTimestamp($calendar->xFormat('U') + 20 * 24 * 3600);
+    }
 
     $f = $calendar->xFormatArray();
     _datex_set_fs($element, $fs, $f, NULL, TRUE);
@@ -271,32 +226,35 @@ function datex_date_select_process_alter(&$element, &$form_state) {
   if (_datex_is_disabled('date')) {
     return;
   }
-  $schema = isset($elementp['#instance']['settings']['datex_schema']) ?
-    $element['#instance']['settings']['datex_schema'] : 'default';
-  if ($schema === 'disabled') {
+  if (_datex_field_schema($element) === 'disabled') {
     return;
   }
-  $granularity = $element['#granularity'];
-  if (!_datex_date_granularities_supported($granularity)) {
-    return NULL;
+  if (!_datex_date_granularity_supported($element['#granularity'])) {
+    return;
   }
+
   $tz = isset($element['#date_timezone']) ? $element['#date_timezone'] : NULL;
-  $calendar = datex_factory($tz, _datex_language_calendar($schema));
+  $calendar = datex_factory($tz, _datex_language_calendar(_datex_field_schema($element)));
   if (!$calendar) {
     return;
   }
 
   $year_now = intval($calendar->format('Y'));
 
+  $is_view = isset($form_state['view']);
   $valid = !empty($element['#value']['year']);
   $element_value = $valid ? $element['#value'] : $element['#default_value'];
   $date_array = $valid ? $element_value : [];
   $input = _datex_get_fs($element, $form_state);
-  dpm(date_select_input_date($element, $element_value));
   if (!empty($element_value) && empty($input)) {
     $date = is_string($element_value)
       ? new DateObject($element_value)
       : date_select_input_date($element, $element_value);
+    if ($date->hasGranularity('month') && !$date->hasGranularity('day')) {
+      // If we set day to 25th, as date module has set it to 1st, conversion
+      // will be correct. Why? can't explain, really.
+      $date->setTimestamp($date->format('U') + 24 * 3600 * 25);
+    }
     if ($date) {
       $calendar->setTimestamp($date->format("U"));
       $date_array = $calendar->formatArray();
@@ -455,7 +413,7 @@ function datex_date_field_widget_settings_form_alter(&$form, $context) {
     '#description' => t('Datex will be disabled for fields without month granularity ' .
       'but with smaller granularity.'),
   ];
-  if (_datex_date_granularities_supported($granularity)) {
+  if (_datex_date_granularity_supported($granularity)) {
     $form['datex_schema'] += [
       '#options' => _datex_schema_form_options(),
       '#default_value' => $schema,
@@ -496,7 +454,7 @@ function datex_date_field_formatter_settings_form_alter(&$form, &$form_state, $c
     return;
   }
 
-  if (!_datex_date_granularities_supported($context['field']['settings']['granularity'])) {
+  if (!_datex_date_granularity_supported($context['field']['settings']['granularity'])) {
     $options = ['disabled' => t('Disabled (Unsupported)')];
     $schema = 'disabled';
     $desc = t('Datex is disabled for fields without month granularity but with day granularity.');
@@ -524,7 +482,7 @@ function datex_date_field_formatter_settings_summary_alter(&$summary, $context) 
     return;
   }
 
-  $summary[] = _datex_date_granularities_supported($context['field']['settings']['granularity'])
+  $summary[] = _datex_date_granularity_supported($context['field']['settings']['granularity'])
     ? t('Datex: @calendar', ['@calendar' => _datex_field_calendar($context)])
     : t('Datex: Disabled (Unsupported)');
 }

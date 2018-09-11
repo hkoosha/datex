@@ -60,6 +60,16 @@ function _datex_add_lib_cal($name) {
   return TRUE;
 }
 
+/**
+ * Read the default date from field, set the read time on datex object.
+ */
+function _datex_set_calendar_time_from_field_default_value($element, DatexInterface $calendar) {
+  $d = date_default_date($element);
+  if ($d) {
+    $calendar->setTimestamp($d->getTimestamp());
+  }
+}
+
 function _datex_popupify(&$element, DatexInterface $calendar, $date_format, $hidden_value) {
   if (_datex_is_disabled('popup')) {
     return NULL;
@@ -327,5 +337,69 @@ function datex_date_popup_process_alter(&$element, &$form_state, $context) {
     $calendar,
     date_part_format('date', $element['#date_format']),
     $hidden_value);
+}
+
+function _datex_dpm($element, $fs, $name = NULL, $type = 'popup') {
+  if (!user_access('access devel information')) {
+    return;
+  }
+
+  $dr = ddebug_backtrace(TRUE);
+  if (is_array($dr)) {
+    array_shift($dr);
+    if (count($dr)) {
+      $dr = array_shift($dr)['file'];
+      if ($dr && isset($dr['file'])) {
+        $dr = $dr['file'];
+      }
+    }
+  }
+  if (!is_string($dr)) {
+    $dr = 'file?:line?';
+  }
+  $name = $name . ' => ' . $dr;
+
+  $dummy = NULL;
+  $input = $fs === NULL ? '?' : _datex_get_fs($element, $fs, NULL, TRUE);
+  $value = $fs === NULL ? '?' : _datex_get_fs($element, $fs, NULL, FALSE);
+
+  $def_obj = date_default_date($element);
+  $def_str = $element['#default_value'];
+  $def_obp = datex_factory(NULL, 'persian');
+  if (date_default_date($element)) {
+    $def_obp->setTimestamp(date_default_date($element)->getTimestamp());
+  }
+  $def_obp = $def_obj
+    ? $def_obp->setTimestamp($def_obj->getTimestamp())->format('Y-m-d H:i:s')
+    : '?';
+
+  switch ($type) {
+    case 'popup':
+      $date_fmt = date_popup_date_format($element);
+      $granule = date_popup_date_granularity($element);
+      break;
+
+    default:
+      $date_fmt = '?';
+      $granule = '?';
+      break;
+  }
+
+  dpm([
+    "['#default_value']" => $def_str,
+    "['#default_value']P" => $def_obp,
+    "['#default_value']obj" => $def_obj,
+    "['#value']" => $element['#value'],
+    "date['#default_value']" => $element['date']['#default_value'],
+    "date['#value']" => $element['date']['#value'],
+    'date_format' => $date_fmt,
+    'granule' => implode(', ', $granule),
+    'input' => $input,
+    'value' => $value,
+    'el' => $element,
+    "fs['values']" => $fs === NULL ? '?' : $fs['values'],
+    "fs['input']" => $fs === NULL ? '?' : $fs['input'],
+    "fs" => $fs,
+  ], $name);
 }
 
