@@ -1,0 +1,16 @@
+Does date popup field work with localized strings?
+- Yes.
+
+Is special format required for date popup field?
+- No, any format can be used.
+
+Does multi-values date field work when the value limit is unlimited?
+- Yes but it is buggy.
+
+How to filter content by post date in views?
+- Enable the module date_views and use `Date: Date (node)` in filters. Core's
+  date filter is NOT supported by datex.
+
+How to get names localized? (translate 'ESFAND')
+- Use the locale module, look for 'esfand' and translate it, or just use l10n_update
+

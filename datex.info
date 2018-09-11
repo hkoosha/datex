@@ -1,0 +1,9 @@
+name = Datex
+description = Localized date for views, node, date field, and...
+package = Date/Time
+core = 7.x
+php = 5.4
+
+dependencies[] = locale
+
+configure = admin/config/regional/date-time/datex

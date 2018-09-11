@@ -1,0 +1,141 @@
+    $calendar = _datex_field_calendar($element);
+    if (!$calendar) {
+      return;
+    }
+
+    dargs();
+    return;
+
+    $date = array();
+    foreach ($element['#granularity'] as $granule) {
+      $date[$granule] = $element[$granule]['#value'];
+      if (empty($date[$granule])) {
+        // Date module will itself invalidate the field.
+        return;
+      }
+    }
+
+    $calendar->setDateLocal(
+      $date['year'],
+      isset($date['month']) ? $date['month'] : 0,
+      isset($date['day']) ? $date['day'] : 0
+    );
+
+    $calendar->setTime(
+      isset($date['hour']) ? $date['hour'] : 12,
+      isset($date['minute']) ? $date['minute'] : 0,
+      isset($date['second']) ? $date['second'] : 0
+    );
+    // $calendar->fixGranularities($element['#granularity']);
+    $nf = array('year' => 'Y', 'month' => 'n', 'day' => 'j');
+    foreach ($nf as $name => $format) {
+      if (isset($element['#value'][$name])) {
+        $value = $calendar->xFormat($format);
+        $element['#value'][$name] = $value;
+        $element[$name]['#value'] = $value;
+      }
+    }
+
+    form_set_value($element, $element['#value'], $form_state);
+    drupal_array_set_nested_value($form_state['input'],
+      $element['#parents'],
+      $element['#value'],
+      TRUE);
+  }
+
+
+
+
+  // ------------------
+
+
+    if (!is_array($element['#value'])) {
+      $value = _datex_date_convert($element['#value']);
+      if ($value) {
+        form_set_value($element, $value, $form_state);
+      }
+      else {
+        form_set_error($element['#name'], t('You have to specify a valid date.'));
+      }
+      return;
+    }
+
+
+
+
+
+
+
+
+
+      case 'date':
+      case 'text':
+        // if not views?
+        $field_real_value =
+          drupal_array_get_nested_value($form_state['input'], $value_path, $input_exists);
+        break;
+
+
+
+// ----------------------------------------------
+
+/**
+ * Does not work when localized.
+ *
+ * @param $date
+ * @param $format
+ * @param $default
+ *
+ * @return array
+ */
+function _datex_parse($date, $format, $default) {
+  $format = preg_quote($format);
+  $pattern = preg_replace('#([a-zA-Z])#', '(?<$1>\d+)', $format);
+  $pattern = '#' . $pattern . '#';
+  $m = [];
+  $d = [
+    'year' => NULL,
+    'month' => NULL,
+    'day' => NULL,
+    'hour' => NULL,
+    'minute' => NULL,
+    'second' => NULL,
+  ];
+  $d = array_merge($d, $default);
+
+  $parts = [
+    'year' => ['o', 'Y'],
+    'month' => ['m', 'n'],
+    'day' => ['d', 'j'],
+    'hour' => ['G', 'H'],
+    'minute' => ['i'],
+    'second' => ['s'],
+    'ampm' => ['a', 'A'],
+  ];
+
+  if (preg_match_all($pattern, $date, $m)) {
+    foreach ($parts as $granule => $part) {
+      foreach ($part as $format_letter) {
+        if (isset($m[$format_letter][0])) {
+          $d[$granule] = $m[$format_letter][0];
+          break;
+        }
+      }
+    }
+    //    if (isset($m['d'][0])) {
+    //      $d['day'] = intval($m['d'][0], 10);
+    //    }
+    //    elseif(isset($m['j'][0])) {
+    //      $d['day'] = intval($m['j'][0], 10);
+    //    }
+    //
+    //    $d['year'] = isset($m['Y'][0]) ? $m['Y'][0] : NULL;
+    //    $d['month'] = isset($m['m'][0]) ? $m['m'][0] : NULL;
+    //    $d['hour'] = isset($m['H'][0]) ? $m['H'][0] : NULL;
+    //    $d['minute'] = isset($m['i'][0]) ? $m['i'][0] : NULL;
+    //    $d['second'] = isset($m['s'][0]) ? $m['s'][0] : NULL;
+  }
+
+  return $d;
+}
+

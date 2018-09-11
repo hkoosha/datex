@@ -1,0 +1,101 @@
+<?php
+
+// we need DATEX_USE_INTL
+require_once 'datex.module';
+
+function _datex_components() {
+  return [
+    'views' => FALSE,
+    'token' => FALSE,
+    'libraries' => FALSE,
+    'node' => FALSE,
+    'comment' => FALSE,
+    'node_admin' => FALSE,
+    'date' => FALSE,
+    'popup' => FALSE,
+    'js' => FALSE,
+  ];
+}
+
+/**
+ * Implements hook_install().
+ */
+function datex_install() {
+  // To run before schedule module.
+  db_update('system')
+    ->fields(['weight' => 100])
+    ->condition('name', 'datex', '=')
+    ->execute();
+
+  variable_set('datex_schema', [
+    'default' => [
+      'fa' => 'persian',
+    ]
+  ]);
+  variable_set('datex_mode', 0);
+  variable_set('datex_popup_theme', '');
+
+  $comp = [];
+  foreach (_datex_components() as $name) {
+    $comp[$name] = FALSE;
+  }
+  variable_set('datex_disable', $comp);
+}
+
+function datex_uninstall() {
+  $del = [
+    'datex_schema',
+    'datex_mode',
+    'datex_popup_theme',
+    'datex_disable',
+  ];
+  foreach ($del as $var) {
+    variable_del($var);
+  }
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function datex_requirements() {
+  $requirements = [];
+  $t = get_t();
+
+  $intl = ['@intl' => ''];
+  $requirements['datex_intl'] = [
+    'title' => $t('PHP Intl'),
+    'severity' => DATEX_USE_INTL ? REQUIREMENT_OK : REQUIREMENT_WARNING,
+    'value' => DATEX_USE_INTL ? $t('Available') : $t('Not available'),
+    'description' => $t(
+      '<a href="http://php.net/manual/en/intl.installation.php">php-intl</a> ' .
+      'is required for full support of non-gregorian calendars. Else, datex ' .
+      'functionality will be very limited', $intl),
+  ];
+
+  $requirements['datex_popup'] = [
+    'title' => $t('Date Popup Library'),
+    'severity' => empty($reason) ? REQUIREMENT_OK : REQUIREMENT_WARNING,
+    'value' => $t('Datex Popup requires extra libraries to work. It can be ' .
+      'found at: <a href="http://keith-wood.name">keith-wood.name</a>.'),
+  ];
+  if (!module_exists('libraries')) {
+    $requirements['datex_popup']['description'] = $t(
+      '<a href="http://drupal.org/project/libraries">libraries</a> module is ' .
+      'not installed');
+  }
+  else {
+    $l_load = libraries_load('jquery_calendars');
+    if (!$l_load['loaded']) {
+      $requirements['datex_popup']['description'] = $l_load['error message'];
+    }
+    else {
+      $requirements['datex_popup']['description'] = t('Library is available');
+    }
+  }
+
+  if (!module_exists('date_popup')) {
+    unset($requirements['datex_popup']);
+  }
+
+  return $requirements;
+}
