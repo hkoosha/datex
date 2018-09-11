@@ -75,7 +75,7 @@ function _datex_popupify(&$element, DatexInterface $calendar, $date_format, $hid
     return NULL;
   }
 
-  $schema = _datex_field_schema($element);
+  $schema = _datex_date_field_schema($element);
   _datex_add_lib_cal($schema);
 
   $name = _datex_language_calendar($schema);
@@ -116,7 +116,7 @@ function _datex_popupify(&$element, DatexInterface $calendar, $date_format, $hid
 
   $s['minDate'] = $from;
   $s['maxDate'] = $to;
-  $s['calendar'] = _datex_language_calendar(_datex_field_schema($element));
+  $s['calendar'] = _datex_language_calendar(_datex_date_field_schema($element));
   $s['dir'] = $GLOBALS['language']->direction ? 'topRight' : 'topLeft';
   $s['langcode'] = $GLOBALS['language']->language;
   $s['langcode'] = 'fa';
@@ -250,7 +250,7 @@ function _datex_popup_date_field_element_validate_callback(&$element, &$fs) {
     return;
   }
 
-  $calendar = _datex_field_calendar($element);
+  $calendar = _datex_date_field_calendar($element);
   if (!$calendar) {
     return;
   }
@@ -293,7 +293,7 @@ function datex_date_popup_process_alter(&$element, &$form_state, $context) {
     return;
   }
 
-  $calendar = _datex_field_calendar($element, TRUE);
+  $calendar = _datex_date_field_calendar($element, TRUE);
   if (!$calendar) {
     return NULL;
   }
