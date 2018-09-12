@@ -43,6 +43,15 @@ function _datex_date_field_granularity($element) {
     }
     return $granularities;
   }
+  elseif (isset($element['#field']['settings']['granularity'])) {
+    $granularities = array_values($element['#field']['settings']['granularity']);
+    foreach ($granularities as $index => $value) {
+      if ($value === 0) {
+        unset($granularities[$index]);
+      }
+    }
+    return $granularities;
+  }
   else {
     return [[], []];
   }

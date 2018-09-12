@@ -139,3 +139,213 @@ function _datex_parse($date, $format, $default) {
   return $d;
 }
 
+
+ // __________________________________________________________________________________________
+
+function _datex_checks(&$form, $who, $boxes) {
+  foreach ($boxes as $box) {
+    $f[$who][$box] = [
+      '#type' => 'checkbox',
+      '#title' => $box,
+    ];
+  }
+}
+
+function _datex_selects(&$form, $who, $boxes) {
+  foreach ($boxes as $box => $options) {
+    $f[$who][$box] = [
+      '#title' => $box,
+      '#type' => 'select',
+      '#options' => drupal_map_assoc($options),
+    ];
+  }
+}
+
+function _datex_texts(&$form, $who, $boxes) {
+  foreach ($boxes as $box) {
+    $f[$who][$box] = [
+      '#type' => 'textfield',
+      '#title' => $box,
+    ];
+  }
+}
+
+function _datex_fieldset(&$form, $title) {
+  $f[$title] = [
+    '#type' => 'fieldset',
+    '#title' => explode('_', $title)[0],
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  ];
+}
+
+
+/**
+ * Do not translate anything here, as the original documentation is not.
+ */
+function datex_popup_admin_form($f, $fs) {
+  $targ = ['@url' => url('https://babakhani.github.io/PersianWebToolkit/doc/datepicker/playground.html')];
+  $f['popup_description'] = [
+    '#type' => 'markup',
+    '#markup' =>
+      '<br><h2>' .
+      t('JS popup default configurations') .
+      ' ' .
+      t('visit <a href="@url">Play Ground</a> to get an idea of how these options work.', $targ) .
+      '</h2><br>',
+  ];
+
+  // -----------------------------------------------
+
+  $w = 'general_fieldset';
+  _datex_fieldset($f, $w);
+
+  $boxes = [
+    'inline',
+    'responsive',
+    'autoClose',
+    'onlySelectOnDate',
+    'observer',
+  ];
+  _datex_checks($f, $w, $boxes);
+
+  $boxes = [
+    'viewMode' => ['day', 'month', 'year'],
+  ];
+  _datex_selects($f, $w, $boxes);
+
+  $boxes = [
+    'format',
+    'altFormat',
+    'minDate',
+    'maxDate',
+    'inputDelay',
+  ];
+  _datex_checks($f, $w, $boxes);
+
+  // -----------------------------------------------
+
+  $w = 'calendar_fieldset';
+  _datex_fieldset($f, $w);
+
+  $boxes = [
+    'persianShowHint' => ['fa', 'en'],
+    'gregorianShowHint' => ['fa', 'en'],
+    'persianLeapYear' => ['algorithmic', 'astronomical'],
+  ];
+  _datex_selects($f, $w, $boxes);
+
+  // -----------------------------------------------
+
+  $w = 'picker_fieldset';
+  _datex_fieldset($f, $w);
+
+  $boxes = [
+    'yearPicker',
+    'monthPicker',
+    'dayPicker',
+  ];
+  _datex_checks($f, $w, $boxes);
+
+  $boxes = [
+    'yearPickerTitleFormat',
+    'monthPickerTitleFormat',
+    'dayPickerTitleFormat',
+  ];
+  _datex_texts($f, $w, $boxes);
+
+  $boxes = [
+    'onlyTimePicker',
+    'timePicker',
+    'timePickerHour',
+    'timePickerMinute',
+    'timePickerSecond',
+  ];
+  _datex_checks($f, $w, $boxes);
+
+  $boxes = [
+    'timePickerHourStep',
+    'timePickerMinuteStep',
+    'timePickerSecondStep',
+  ];
+  _datex_texts($f, $w, $boxes);
+
+  $boxes = [
+    'timePickerMeridian',
+  ];
+  _datex_checks($f, $w, $boxes);
+
+  $boxes = [
+    'timePickerStep',
+  ];
+  _datex_texts($f, $w, $boxes);
+
+  // -----------------------------------------------
+
+  $w = 'picker_navigator';
+  _datex_fieldset($f, $w);
+
+  $boxes = [
+    'navigatorEnabled',
+    'navigatorScrollEnabled',
+  ];
+  _datex_checks($f, $w, $boxes);
+
+  $boxes = [
+    'nextButtonText',
+    'previousButtonText',
+  ];
+  _datex_texts($f, $w, $boxes);
+
+  // -----------------------------------------------
+
+  $w = 'picker_toolbox';
+  _datex_fieldset($f, $w);
+
+  $boxes = [
+    'toolboxEnabled',
+    'todayButtonEnabled',
+  ];
+  _datex_checks($f, $w, $boxes);
+
+  $boxes = [
+    'todayButtonFaText',
+    'todayButtonEnText',
+  ];
+  _datex_texts($f, $w, $boxes);
+
+  $boxes = [
+    'submitButtonEnabled',
+  ];
+  _datex_checks($f, $w, $boxes);
+
+  $boxes = [
+    'submitButtonFaText',
+    'submitButtonEnText',
+  ];
+  _datex_texts($f, $w, $boxes);
+
+  $boxes = [
+    'enableCalendarSwitch',
+  ];
+  _datex_checks($f, $w, $boxes);
+
+  $boxes = [
+    'calendarSwitchTextFormatString',
+  ];
+  _datex_texts($f, $w, $boxes);
+
+  $f['actions']['submit'] = [
+    '#type' => 'submit',
+    '#submit' => ['_datex_popup_admin_form_submit'],
+    '#value' => t('Save'),
+    '#name' => 'config',
+  ];
+  return $f;
+}
+
+function _datex_popup_admin_form_submit($f, &$fs) {
+  $v = $form_state['values'];
+  drupal_set_message(t('Configuration saved.'));
+}
+

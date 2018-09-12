@@ -4,6 +4,7 @@ function _datex_add_lib_cal() {
   static $self_loaded = FALSE;
   if (!$self_loaded) {
     $datex_module_path = drupal_get_path('module', 'datex');
+    drupal_add_js($datex_module_path . '/asset/datex.js');
     drupal_add_js($datex_module_path . '/asset/persian-date.min.js');
     drupal_add_js($datex_module_path . '/asset/persian-datepicker.min.js');
     drupal_add_css($datex_module_path . '/asset/persian-datepicker.min.css');
@@ -65,7 +66,6 @@ function _datex_popupify(&$element, DatexInterface $calendar, $date_format, $hid
   }
 
   $schema = _datex_date_field_schema($element);
-
   $d = date_default_date($element);
   if ($d) {
     $calendar->setTimestamp($d->getTimestamp());
@@ -160,7 +160,7 @@ function _datex_popup_date_field_element_validate_callback(&$element, &$fs) {
   $def = date_default_date($element);
   $date_fmt = date_popup_date_format($element);
   $g = date_popup_date_granularity($element);
-  _datex_fix_missing_granularity($calendar->getLocaleName(), $def, $g);
+  _datex_fix_missing_granularity($def, $g, $calendar->getLocaleName());
 
   if (!_datex_popup_set_hidden_date_on_calendar($calendar, $hval, $g)) {
     form_set_error($element['#name'], t('Invalid date'));
@@ -185,15 +185,16 @@ function datex_date_popup_process_alter(&$element, &$form_state, $context) {
     return NULL;
   }
 
+  dpm($element);
+
   $date_fmt = date_popup_date_format($element);
   $def = date_default_date($element);
   $input = _datex_get_fs($element, $form_state);
   $g = date_popup_date_granularity($element);
   $hidden_value = '';
-  _datex_fix_missing_granularity($calendar->getLocaleName(), $def, $g);
+  _datex_fix_missing_granularity($def, $g, $calendar->getLocaleName());
 
   if (!empty($element['date']['#default_value'])) {
-    _datex_dpm($element, $form_state, 'has def');
     $calendar->setTimestamp($def->getTimestamp());
     $element['date']['#default_value'] = $calendar->format($date_fmt);
     $hidden_value = $calendar->format(DATEX_HIDDEN_VALUE_FMT);
@@ -209,7 +210,6 @@ function datex_date_popup_process_alter(&$element, &$form_state, $context) {
   }
   elseif (!empty($element['date']['#value'])) {
     if ($def) {
-      _datex_dpm($element, $form_state, 'has def val');
       $calendar->setTimestamp($def->getTimestamp());
       $element['date']['#value'] = $calendar->format($date_fmt);
       $hidden_value = $calendar->format(DATEX_HIDDEN_VALUE_FMT);
@@ -225,68 +225,3 @@ function datex_date_popup_process_alter(&$element, &$form_state, $context) {
     date_part_format('date', $element['#date_format']),
     $hidden_value);
 }
-
-function _datex_dpm($element, $fs, $name = NULL, $type = 'popup') {
-  if (!user_access('access devel information')) {
-    return;
-  }
-
-  $dr = ddebug_backtrace(TRUE);
-  if (is_array($dr)) {
-    array_shift($dr);
-    if (count($dr)) {
-      $dr = array_shift($dr)['file'];
-      if ($dr && isset($dr['file'])) {
-        $dr = $dr['file'];
-      }
-    }
-  }
-  if (!is_string($dr)) {
-    $dr = 'file?:line?';
-  }
-  $name = $name . ' => ' . $dr;
-
-  $dummy = NULL;
-  $input = $fs === NULL ? '?' : _datex_get_fs($element, $fs, NULL, TRUE);
-  $value = $fs === NULL ? '?' : _datex_get_fs($element, $fs, NULL, FALSE);
-
-  $def_obj = date_default_date($element);
-  $def_str = $element['#default_value'];
-  $def_obp = datex_factory(NULL, 'persian');
-  if (date_default_date($element)) {
-    $def_obp->setTimestamp(date_default_date($element)->getTimestamp());
-  }
-  $def_obp = $def_obj
-    ? $def_obp->setTimestamp($def_obj->getTimestamp())->format('Y-m-d H:i:s')
-    : '?';
-
-  switch ($type) {
-    case 'popup':
-      $date_fmt = date_popup_date_format($element);
-      $granule = date_popup_date_granularity($element);
-      break;
-
-    default:
-      $date_fmt = '?';
-      $granule = '?';
-      break;
-  }
-
-  dpm([
-    "['#default_value']" => $def_str,
-    "['#default_value']P" => $def_obp,
-    "['#default_value']obj" => $def_obj,
-    "['#value']" => $element['#value'],
-    "date['#default_value']" => $element['date']['#default_value'],
-    "date['#value']" => $element['date']['#value'],
-    'date_format' => $date_fmt,
-    'granule' => implode(', ', $granule),
-    'input' => $input,
-    'value' => $value,
-    'el' => $element,
-    "fs['values']" => $fs === NULL ? '?' : $fs['values'],
-    "fs['input']" => $fs === NULL ? '?' : $fs['input'],
-    "fs" => $fs,
-  ], $name);
-}
-
