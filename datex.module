@@ -9,13 +9,15 @@ else {
 }
 
 require_once 'calendar.inc';
-require_once 'datex.views.inc';
 
 if (module_exists('date')) {
   require_once 'datex_date.inc';
 }
 if (module_exists('date_popup')) {
   require_once 'datex_popup.inc';
+}
+if (module_exists('date_views')) {
+  require_once 'datex.views.inc';
 }
 
 /**

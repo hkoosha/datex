@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Implementation of hook_views_api().
  */
@@ -18,12 +17,24 @@ function datex_views_data_alter(&$data) {
   if (_datex_is_disabled('views') || _datex_is_patching_mode()) {
     return;
   }
-
   foreach ($data as $key => &$value) {
     if (is_array($value)) {
       datex_views_data_alter($value);
     }
 
+    if ($value === 'date_views_argument_handler_simple') {
+      $value = '_datex_date_views_argument_handler_simple';
+    }
+
+    // Field Formatter --------------------------------------------------------
+    $change = [
+      'year',
+      'month',
+      'day',
+      'fulldate',
+      'year_month',
+      'week',
+    ];
     $change = [
       'views_handler_field_date',
       'views_handler_filter_date',
@@ -32,26 +43,25 @@ function datex_views_data_alter(&$data) {
       'views_handler_filter_ncs_last_updated',
       'views_handler_filter_history_user_timestamp',
       'views_handler_field_history_user_timestamp',
-      'views_handler_argument_node_created_year',
     ];
-    foreach ([
-               'year',
-               'month',
-               'day',
-               'fulldate',
-               'year_month',
-             ] as $item) {
-      $change[] = 'views_handler_argument_node_created_' . $item;
-    }
     if (in_array($value, $change, TRUE)) {
       $value = '_datex_' . $value;
     }
 
-    foreach (['fulldate', 'year_month', 'year', 'month', 'day', 'week'] as $g) {
-      foreach ([
-                 'views_handler_argument_node_created_',
-                 'views_handler_argument_node_changed_',
-               ] as $item) {
+    // Contextual filters -----------------------------------------------------
+    $change = [
+      'year',
+      //        'month',
+      //        'day',
+      'fulldate',
+      'year_month',
+      //        'week',
+    ];
+    foreach ([
+               'views_handler_argument_node_created_',
+               'views_handler_argument_node_changed_',
+             ] as $item) {
+      foreach ($change as $g) {
         if ($value === $item . $g) {
           $value = '_datex_' . $value;
         }
@@ -60,9 +70,186 @@ function datex_views_data_alter(&$data) {
   }
 }
 
+// ============================================================================
+// ================================================================= CONTEXTUAL
+// ============================================================================
+
 class _datex_views_handler_argument_node_created_year extends views_handler_argument_node_created_year {
 
+  function _datex_invalid() {
+    $this->argument = '000000';
+    return FALSE;
+  }
+
+  function _datex_process() {
+    if (isset($this->datexed) && $this->datexed) {
+      return;
+    }
+    $this->datexed = TRUE;
+
+    $calendar = _datex_date_field_calendar($this->options, FALSE);
+    if (!$calendar) {
+      return;
+    }
+
+    if (empty($this->argument) || strlen($this->argument) !== 4) {
+      return $this->_datex_invalid();
+    }
+    $year = (int) $this->argument;
+    if ($year < 0) {
+      return $this->_datex_invalid();
+    }
+
+    $month = 6;
+    $day = 25;
+
+    $calendar->setDateLocale($year, $month, $day);
+    $this->argument = $calendar->xFormat('Y');
+  }
+
+  function query($group_by = FALSE) {
+    $this->_datex_process();
+    return parent::query($group_by);
+  }
+
+  function option_definition() {
+    $options = parent::option_definition();
+    $options['datex_schema'] = ['default' => 'default'];
+    return $options;
+  }
+
+  function options_form(&$form, &$form_state) {
+    parent::options_form($form, $form_state);
+    $form['datex_schema'] = [
+      '#title' => t('Datex Schema'),
+      '#type' => 'select',
+      '#options' => _datex_schema_form_options(),
+      '#default_value' => $this->options['datex_schema'],
+    ];
+  }
+
 }
+
+class _datex_views_handler_argument_node_created_year_month extends views_handler_argument_node_created_year_month {
+
+  function _datex_invalid() {
+    $this->argument = '000000';
+    return FALSE;
+  }
+
+  function _datex_process() {
+    if (isset($this->datexed) && $this->datexed) {
+      return;
+    }
+    $this->datexed = TRUE;
+
+    $calendar = _datex_date_field_calendar($this->options, FALSE);
+    if (!$calendar) {
+      return;
+    }
+
+    if (empty($this->argument) || strlen($this->argument) < 5 || strlen($this->argument) > 6) {
+      return $this->_datex_invalid();
+    }
+
+    $split = str_split($this->argument, 4);
+    if (count($split) !== 2 || strlen($split[1]) > 2 || empty($split[1])) {
+      return $this->_datex_invalid();
+    }
+    $year = (int) $split[0];
+    $month = (int) $split[1];
+    if ($month < 1 || $month > 12) {
+      return $this->_datex_invalid();
+    }
+    $day = 24;
+
+    $calendar->setDateLocale($year, $month, $day);
+    $this->argument = $calendar->xFormat('Ym');
+  }
+
+  function query($group_by = FALSE) {
+    $this->_datex_process();
+    return parent::query($group_by);
+  }
+
+  function option_definition() {
+    $options = parent::option_definition();
+    $options['datex_schema'] = ['default' => 'default'];
+    return $options;
+  }
+
+  function options_form(&$form, &$form_state) {
+    parent::options_form($form, $form_state);
+    $form['datex_schema'] = [
+      '#title' => t('Datex Schema'),
+      '#type' => 'select',
+      '#options' => _datex_schema_form_options(),
+      '#default_value' => $this->options['datex_schema'],
+    ];
+  }
+
+}
+
+class _datex_views_handler_argument_node_created_fulldate extends views_handler_argument_node_created_fulldate {
+
+  function _datex_invalid() {
+    $this->argument = '000000';
+    return FALSE;
+  }
+
+  function _datex_process() {
+    if (isset($this->datexed) && $this->datexed) {
+      return;
+    }
+    $this->datexed = TRUE;
+
+    $calendar = _datex_date_field_calendar($this->options, FALSE);
+    if (!$calendar) {
+      return;
+    }
+
+    if (empty($this->argument) || strlen($this->argument) !== 8) {
+      return $this->_datex_invalid();
+    }
+    $split0 = str_split($this->argument, 4);
+    $split1 = str_split($split0[1], 2);
+    $year = (int) $split0[0];
+    $month = (int) $split1[0];
+    $day = (int) $split1[1];
+    if ($month < 1 || $month > 12) {
+      return $this->_datex_invalid();
+    }
+    if ($day < 1 || $day > 31) {
+      return $this->_datex_invalid();
+    }
+
+    $calendar->setDateLocale($year, $month, $day);
+    $this->argument = $calendar->xFormat('Ym');
+  }
+
+  function query($group_by = FALSE) {
+    $this->_datex_process();
+    return parent::query($group_by);
+  }
+
+  function option_definition() {
+    $options = parent::option_definition();
+    $options['datex_schema'] = ['default' => 'default'];
+    return $options;
+  }
+
+  function options_form(&$form, &$form_state) {
+    parent::options_form($form, $form_state);
+    $form['datex_schema'] = [
+      '#title' => t('Datex Schema'),
+      '#type' => 'select',
+      '#options' => _datex_schema_form_options(),
+      '#default_value' => $this->options['datex_schema'],
+    ];
+  }
+
+}
+
 
 class _datex_views_handler_argument_node_created_month extends views_handler_argument_node_created_month {
 
@@ -76,13 +263,10 @@ class _datex_views_handler_argument_node_created_day extends views_handler_argum
 
 }
 
-class _datex_views_handler_argument_node_created_year_month extends views_handler_argument_node_created_year_month {
 
-}
-
-class _datex_views_handler_argument_node_created_fulldate extends views_handler_argument_node_created_fulldate {
-
-}
+// ============================================================================
+// ================================================================ DATE RENDER
+// ============================================================================
 
 class _datex_views_handler_field_date extends views_handler_field_date {
 
@@ -216,10 +400,7 @@ class _datex_views_handler_filter_date extends views_handler_filter_date {
   }
 
   function exposed_validate(&$form, &$form_state) {
-    //    dpm($form, 'ex val f');
-    //    dpm($form_state, 'ex val fs');
     $value = &$form_state['values'][$this->options['expose']['identifier']];
-    //    dpm($value, 'value');
 
     $operator = !empty($this->options['expose']['use_operator'])
     && !empty($this->options['expose']['operator_id'])
@@ -228,26 +409,69 @@ class _datex_views_handler_filter_date extends views_handler_filter_date {
 
     $operators = $this->operators();
 
+    dpm($operator);
+    dpm($value);
     if ($operators[$operator]['values'] == 1) {
-      $convert = strtotime($value['value']);
+      $convert = $this->_datex_strtotime($value['value']);
       if (!empty($form['value']) && ($convert == -1 || $convert === FALSE)) {
         form_error($form['value'], t('Invalid date format.'));
       }
     }
     elseif ($operators[$operator]['values'] == 2) {
-      $min = strtotime($value['min']);
+      $min = $this->_datex_strtotime($value['min']);
       if ($min == -1 || $min === FALSE) {
         form_error($form['min'], t('Invalid date format.'));
       }
-      $max = strtotime($value['max']);
+      $max = $this->_datex_strtotime($value['max']);
       if ($max == -1 || $max === FALSE) {
         form_error($form['max'], t('Invalid date format.'));
       }
     }
   }
 
+  function _datex_strtotime($value) {
+    return -1;
+  }
+
   function value_form(&$form, &$form_state) {
     parent::value_form($form, $form_state);
-    //    dpm($form, 'exposed');
   }
+
+}
+
+
+// ============================================================================
+// ================================================================= DATE FIELD
+// ============================================================================
+
+class _datex_date_views_argument_handler_simple extends date_views_argument_handler_simple {
+
+  function query($group_by = FALSE) {
+    if (!isset($this->datexed) || !$this->datexed) {
+      $this->datexed = TRUE;
+      $calendar = _datex_date_field_calendar($this->options, FALSE);
+      if ($calendar) {
+        $calendar->setDateLocale($this->argument, 1, 1);
+        $this->argument = $calendar->xFormat('Y');
+      }
+    }
+    return parent::query($group_by);
+  }
+
+  function option_definition() {
+    $options = parent::option_definition();
+    $options['datex_schema'] = ['default' => 'default'];
+    return $options;
+  }
+
+  function options_form(&$form, &$form_state) {
+    parent::options_form($form, $form_state);
+    $form['datex_schema'] = [
+      '#title' => t('Datex Schema'),
+      '#type' => 'select',
+      '#options' => _datex_schema_form_options(),
+      '#default_value' => $this->options['datex_schema'],
+    ];
+  }
+
 }

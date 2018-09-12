@@ -17,36 +17,37 @@
         <counts>
           <entry key="project.closed" value="2" />
           <entry key="project.open.time.0" value="2" />
-          <entry key="project.opened" value="2" />
+          <entry key="project.open.time.5" value="1" />
+          <entry key="project.opened" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="inc" value="24" />
-          <entry key="module" value="6" />
-          <entry key="php" value="4" />
-          <entry key="say" value="4" />
+          <entry key="inc" value="33" />
+          <entry key="module" value="7" />
+          <entry key="php" value="5" />
+          <entry key="say" value="6" />
           <entry key="todo" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="PHP" value="34" />
-          <entry key="PLAIN_TEXT" value="5" />
+          <entry key="PHP" value="45" />
+          <entry key="PLAIN_TEXT" value="7" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="inc" value="17772" />
-          <entry key="module" value="259" />
-          <entry key="php" value="34" />
-          <entry key="say" value="146" />
+          <entry key="inc" value="27065" />
+          <entry key="module" value="434" />
+          <entry key="php" value="46" />
+          <entry key="say" value="291" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PHP" value="18065" />
-          <entry key="PLAIN_TEXT" value="146" />
+          <entry key="PHP" value="27545" />
+          <entry key="PLAIN_TEXT" value="291" />
         </counts>
       </usages-collector>
     </session>
@@ -54,87 +55,59 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/datex_date.inc">
+        <entry file="file://$PROJECT_DIR$/datex.views.inc">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="864">
-              <caret line="307" column="62" selection-start-line="307" selection-start-column="62" selection-end-line="307" selection-end-column="62" />
+            <state relative-caret-position="624">
+              <caret line="431" column="11" selection-start-line="431" selection-start-column="11" selection-end-line="431" selection-end-column="11" />
               <folding>
-                <element signature="e#514#582#0#PHP" />
-                <element signature="e#749#1302#0#PHP" />
-                <element signature="e#831#1135#0#PHP" />
-                <element signature="e#979#1104#0#PHP" />
-                <element signature="e#1032#1098#0#PHP" />
-                <element signature="e#1275#1302#0#PHP" />
-                <element signature="e#1626#1951#0#PHP" />
-                <element signature="e#1649#1793#0#PHP" />
-                <element signature="e#1798#1921#0#PHP" />
-                <element signature="e#1926#2048#0#PHP" />
-                <element signature="e#2053#2104#0#PHP" />
-                <element signature="e#1539#2169#0#PHP" />
-                <element signature="e#1672#1813#0#PHP" />
-                <element signature="e#1816#1933#0#PHP" />
-                <element signature="e#1936#2134#0#PHP" />
-                <element signature="e#2137#2169#0#PHP" />
-                <element signature="e#2442#2491#0#PHP" />
-                <element signature="e#1947#1997#0#PHP" />
-                <element signature="e#2087#2166#0#PHP" />
-                <element signature="e#3458#3527#0#PHP" />
-                <element signature="e#3656#3846#0#PHP" />
-                <element signature="e#3705#3813#0#PHP" />
-                <element signature="e#3816#3846#0#PHP" />
-                <element signature="e#3983#4023#0#PHP" />
-                <element signature="e#4062#4118#0#PHP" />
-                <element signature="e#2968#3024#0#PHP" />
-                <element signature="e#4321#4720#0#PHP" />
-                <element signature="e#4737#5084#0#PHP" />
-                <element signature="e#3787#3850#0#PHP" />
-                <element signature="e#3854#4219#0#PHP" />
-                <element signature="e#4873#4958#0#PHP" />
-                <element signature="e#6820#6853#0#PHP" />
-                <element signature="e#6930#7630#0#PHP" />
-                <element signature="e#6947#7094#0#PHP" />
-                <element signature="e#7100#7277#0#PHP" />
-                <element signature="e#5778#5799#0#PHP" />
-                <element signature="e#6385#6473#0#PHP" />
-                <element signature="e#6431#6464#0#PHP" />
-                <element signature="e#6734#6807#0#PHP" />
-                <element signature="e#8617#9238#0#PHP" />
-                <element signature="e#9079#9234#0#PHP" />
-                <element signature="e#9243#9815#0#PHP" />
-                <element signature="e#9582#9722#0#PHP" />
-                <element signature="e#9728#9811#0#PHP" />
-                <element signature="e#9818#10309#0#PHP" />
-                <element signature="e#10038#10114#0#PHP" />
-                <element signature="e#10121#10214#0#PHP" />
-                <element signature="e#10220#10305#0#PHP" />
-                <element signature="e#10312#10482#0#PHP" />
-                <element signature="e#10397#10478#0#PHP" />
-                <element signature="e#10732#10765#0#PHP" />
-                <element signature="e#9468#9976#0#PHP" />
-                <element signature="e#11315#11492#0#PHP" />
-                <element signature="e#11761#11810#0#PHP" />
-                <element signature="e#11814#12116#0#PHP" />
-                <element signature="e#12120#12473#0#PHP" />
-                <element signature="e#12160#12469#0#PHP" />
-                <element signature="e#12636#12685#0#PHP" />
-                <element signature="e#12689#12874#0#PHP" />
-                <element signature="e#12748#12870#0#PHP" />
-                <element signature="e#13052#13101#0#PHP" />
-                <element signature="e#13547#13897#0#PHP" />
-                <element signature="e#13633#13725#0#PHP" />
-                <element signature="e#11781#12148#0#PHP" />
-                <element signature="e#11816#12132#0#PHP" />
-                <element signature="e#12022#12125#1#PHP" />
-                <element signature="e#14081#14130#0#PHP" />
-                <element signature="e#14134#14240#0#PHP" />
-                <element signature="e#14243#14345#0#PHP" />
-                <element signature="e#14512#14561#0#PHP" />
-                <element signature="e#12808#13468#0#PHP" />
-                <element signature="e#12924#13214#0#PHP" />
-                <element signature="e#13117#13216#1#PHP" />
-                <element signature="e#13222#13468#0#PHP" />
-                <element signature="e#13257#13463#0#PHP" />
-                <element signature="e#15308#15357#0#PHP" />
+                <element signature="e#93#164#0#PHP" />
+                <element signature="n#datex_views_data_alter#0;n#!!top" expanded="true" />
+                <element signature="e#260#339#0#PHP" />
+                <element signature="e#384#451#0#PHP" />
+                <element signature="e#455#527#0#PHP" />
+                <element signature="e#1342#1441#0#PHP" />
+                <element signature="e#2228#2294#0#PHP" />
+                <element signature="e#2394#2431#0#PHP" />
+                <element signature="e#2437#2542#0#PHP" />
+                <element signature="e#2528#2707#0#PHP" />
+                <element signature="n#_datex_views_handler_argument_node_created_year_month#0;n#!!top" expanded="true" />
+                <element signature="n#_datex_process#0;n#_datex_views_handler_argument_node_created_year_month#0;n#!!top" expanded="true" />
+                <element signature="e#3241#3307#0#PHP" />
+                <element signature="e#3407#3444#0#PHP" />
+                <element signature="e#3705#3840#0#PHP" />
+                <element signature="e#3636#3751#0#PHP" />
+                <element signature="e#3815#3891#0#PHP" />
+                <element signature="e#4363#4542#0#PHP" />
+                <element signature="n#_datex_views_handler_argument_node_created_fulldate#0;n#!!top" expanded="true" />
+                <element signature="e#4786#4852#0#PHP" />
+                <element signature="e#4952#4989#0#PHP" />
+                <element signature="e#5251#5356#0#PHP" />
+                <element signature="e#5360#5436#0#PHP" />
+                <element signature="e#5616#5692#0#PHP" />
+                <element signature="e#5908#6087#0#PHP" />
+                <element signature="e#2444#2588#0#PHP" />
+                <element signature="e#3048#3279#0#PHP" />
+                <element signature="e#3437#3617#0#PHP" />
+                <element signature="e#3663#3721#0#PHP" />
+                <element signature="e#3914#3975#0#PHP" />
+                <element signature="e#4060#4219#0#PHP" />
+                <element signature="e#4175#4219#0#PHP" />
+                <element signature="e#4224#4283#0#PHP" />
+                <element signature="e#4964#5181#0#PHP" />
+                <element signature="e#5044#5115#0#PHP" />
+                <element signature="e#5211#5245#0#PHP" />
+                <element signature="e#5274#5485#0#PHP" />
+                <element signature="e#5516#5763#0#PHP" />
+                <element signature="e#5961#6029#0#PHP" />
+                <element signature="n#exposed_validate#0;n#_datex_views_handler_filter_date#0;n#!!top" expanded="true" />
+                <element signature="e#6579#7180#0#PHP" />
+                <element signature="e#6674#6816#0#PHP" />
+                <element signature="e#6827#7180#0#PHP" />
+                <element signature="e#6920#7024#0#PHP" />
+                <element signature="e#7070#7174#0#PHP" />
+                <element signature="e#7774#8112#0#PHP" />
+                <element signature="e#7891#8043#0#PHP" />
+                <element signature="e#8396#8552#0#PHP" />
               </folding>
             </state>
           </provider>
@@ -147,11 +120,12 @@
       <list>
         <option value="$PROJECT_DIR$/../views/modules/node/views_handler_argument_dates_various.inc" />
         <option value="$PROJECT_DIR$/../views/includes/handlers.inc" />
-        <option value="$PROJECT_DIR$/datex.views.inc" />
         <option value="$PROJECT_DIR$/calendar.inc" />
         <option value="$PROJECT_DIR$/datex_popup.inc" />
+        <option value="$PROJECT_DIR$/datex.module" />
         <option value="$PROJECT_DIR$/datex_date.inc" />
         <option value="$PROJECT_DIR$/files/say" />
+        <option value="$PROJECT_DIR$/datex.views.inc" />
       </list>
     </option>
   </component>
@@ -176,7 +150,7 @@
       <path value="$PROJECT_DIR$/../calendar_systems" />
     </include_path>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="y" value="27" />
     <option name="width" value="1400" />
     <option name="height" value="1000" />
@@ -206,9 +180,9 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="SearchEverywhereHistoryKey" value="DateObje&#9;null&#9;null" />
+    <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file:///var/www/ep/sites/all/modules/views/modules/node/views_handler_argument_dates_various.inc&#10;DateObje&#9;null&#9;null" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../.." />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../date" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
@@ -226,7 +200,8 @@
     </option>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="27" width="1920" height="1053" extended-state="6" />
+    <frame x="0" y="27" width="1920" height="1053" extended-state="7" />
+    <editor active="true" />
     <layout>
       <window_info id="Structure" order="0" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="1" side_tool="true" />
@@ -243,45 +218,17 @@
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info active="true" anchor="right" content_ui="combo" id="Project" order="3" visible="true" weight="0.1765625" />
+      <window_info active="true" anchor="right" content_ui="combo" id="Project" order="3" visible="true" weight="0.24583334" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../views/handlers/views_handler_argument.inc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2064">
-          <caret line="35" column="45" lean-forward="true" selection-start-line="35" selection-start-column="45" selection-end-line="35" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../views/handlers/views_handler_argument_formula.inc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="17" column="65" selection-start-line="17" selection-start-column="65" selection-end-line="17" selection-end-column="65" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../views/handlers/views_handler_argument_date.inc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="25" column="64" selection-start-line="25" selection-start-column="64" selection-end-line="25" selection-end-column="64" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../views/includes/handlers.inc">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="984">
           <caret line="1332" column="17" selection-start-line="1332" selection-start-column="17" selection-end-line="1332" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../views/modules/node/views_handler_argument_dates_various.inc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="274">
-          <caret line="147" column="43" selection-start-line="147" selection-start-column="43" selection-end-line="147" selection-end-column="43" />
         </state>
       </provider>
     </entry>
@@ -298,125 +245,6 @@
           <caret line="12" column="6" selection-start-line="12" selection-start-column="6" selection-end-line="12" selection-end-column="6" />
           <folding>
             <element signature="n#views_handler_filter_date#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/datex.views.inc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="514">
-          <caret line="230" column="46" selection-start-line="230" selection-start-column="46" selection-end-line="230" selection-end-column="46" />
-          <folding>
-            <element signature="e#93#164#0#PHP" />
-            <element signature="e#260#339#0#PHP" />
-            <element signature="e#343#1513#0#PHP" />
-            <element signature="e#384#451#0#PHP" />
-            <element signature="e#467#843#0#PHP" />
-            <element signature="e#858#999#0#PHP" />
-            <element signature="e#849#1083#0#PHP" />
-            <element signature="e#1088#1167#0#PHP" />
-            <element signature="e#1173#1509#0#PHP" />
-            <element signature="e#1265#1397#0#PHP" />
-            <element signature="e#1256#1503#0#PHP" />
-            <element signature="e#1418#1495#0#PHP" />
-            <element signature="n#_datex_views_handler_field_date#0;n#!!top" expanded="true" />
-            <element signature="e#2444#2588#0#PHP" />
-            <element signature="e#3048#3279#0#PHP" />
-            <element signature="e#3437#3617#0#PHP" />
-            <element signature="e#3663#3721#0#PHP" />
-            <element signature="e#3914#3975#0#PHP" />
-            <element signature="e#4060#4219#0#PHP" />
-            <element signature="e#4175#4219#0#PHP" />
-            <element signature="e#4224#4283#0#PHP" />
-            <element signature="e#4964#5181#0#PHP" />
-            <element signature="e#5044#5115#0#PHP" />
-            <element signature="e#5211#5245#0#PHP" />
-            <element signature="e#5274#5485#0#PHP" />
-            <element signature="e#5516#5763#0#PHP" />
-            <element signature="e#5961#6029#0#PHP" />
-            <element signature="e#6674#6816#0#PHP" />
-            <element signature="e#6920#7024#0#PHP" />
-            <element signature="e#7070#7174#0#PHP" />
-            <element signature="n#value_form#0;n#_datex_views_handler_filter_date#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/datex.module">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="264">
-          <caret line="16" column="32" selection-start-line="16" selection-start-column="32" selection-end-line="16" selection-end-column="32" />
-          <folding>
-            <element signature="e#7#212#0#PHP" />
-            <element signature="e#39#137#1#PHP" />
-            <element signature="e#141#212#0#PHP" />
-            <element signature="e#546#788#0#PHP" />
-            <element signature="e#849#1110#0#PHP" />
-            <element signature="e#1306#1590#0#PHP" />
-            <element signature="e#1829#1896#0#PHP" />
-            <element signature="e#2192#2251#0#PHP" />
-            <element signature="e#2254#2309#0#PHP" />
-            <element signature="e#2429#2504#0#PHP" />
-            <element signature="e#3023#3108#0#PHP" />
-            <element signature="e#3124#3230#0#PHP" />
-            <element signature="e#3234#3357#0#PHP" />
-            <element signature="e#3618#3696#0#PHP" />
-            <element signature="e#3731#3764#0#PHP" />
-            <element signature="e#3935#4147#0#PHP" />
-            <element signature="e#4011#4142#0#PHP" />
-            <element signature="e#4052#4141#0#PHP" />
-            <element signature="e#4333#4414#0#PHP" />
-            <element signature="e#4448#4481#0#PHP" />
-            <element signature="e#4849#4979#0#PHP" />
-            <element signature="e#4890#4978#0#PHP" />
-            <element signature="e#5077#5110#0#PHP" />
-            <element signature="e#5114#5166#0#PHP" />
-            <element signature="e#5363#5596#0#PHP" />
-            <element signature="e#5539#5596#0#PHP" />
-            <element signature="e#5664#5730#0#PHP" />
-            <element signature="e#5765#5849#0#PHP" />
-            <element signature="e#6033#6350#0#PHP" />
-            <element signature="e#6266#6350#0#PHP" />
-            <element signature="e#6617#6650#0#PHP" />
-            <element signature="e#6654#9500#0#PHP" />
-            <element signature="e#6782#6870#0#PHP" />
-            <element signature="e#6928#6963#0#PHP" />
-            <element signature="e#6968#7217#0#PHP" />
-            <element signature="e#7224#8893#0#PHP" />
-            <element signature="e#7268#7326#0#PHP" />
-            <element signature="e#7409#7755#0#PHP" />
-            <element signature="e#7524#7657#0#PHP" />
-            <element signature="e#7760#8656#0#PHP" />
-            <element signature="e#7805#8650#0#PHP" />
-            <element signature="e#7865#8026#0#PHP" />
-            <element signature="e#8108#8642#0#PHP" />
-            <element signature="e#8152#8450#0#PHP" />
-            <element signature="e#8661#8889#0#PHP" />
-            <element signature="e#8896#9500#0#PHP" />
-            <element signature="e#8999#9060#0#PHP" />
-            <element signature="e#9065#9129#0#PHP" />
-            <element signature="e#9134#9418#0#PHP" />
-            <element signature="e#9854#9907#0#PHP" />
-            <element signature="e#9912#10155#0#PHP" />
-            <element signature="e#10177#10253#0#PHP" />
-            <element signature="e#10322#10462#0#PHP" />
-            <element signature="e#10533#10675#0#PHP" />
-            <element signature="e#10742#10880#0#PHP" />
-            <element signature="e#10903#11202#0#PHP" />
-            <element signature="e#10960#11174#1#PHP" />
-            <element signature="e#11217#11294#0#PHP" />
-            <element signature="e#11258#11289#1#PHP" />
-            <element signature="e#11444#11497#0#PHP" />
-            <element signature="e#11524#12828#0#PHP" />
-            <element signature="e#11688#12224#0#PHP" />
-            <element signature="e#11736#12218#0#PHP" />
-            <element signature="e#11761#11904#0#PHP" />
-            <element signature="e#11914#12058#0#PHP" />
-            <element signature="e#12068#12210#0#PHP" />
-            <element signature="e#12229#12824#0#PHP" />
-            <element signature="e#12302#12818#0#PHP" />
-            <element signature="e#12415#12810#0#PHP" />
-            <element signature="e#12630#12810#0#PHP" />
           </folding>
         </state>
       </provider>
@@ -918,94 +746,296 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/files/say">
+    <entry file="file://$PROJECT_DIR$/datex.module">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="10" column="33" selection-start-line="10" selection-start-column="33" selection-end-line="10" selection-end-column="33" />
+        <state relative-caret-position="480">
+          <caret line="74" column="9" selection-start-line="74" selection-start-column="9" selection-end-line="74" selection-end-column="9" />
+          <folding>
+            <element signature="e#7#212#0#PHP" />
+            <element signature="e#39#137#1#PHP" />
+            <element signature="e#141#212#0#PHP" />
+            <element signature="e#276#339#0#PHP" />
+            <element signature="e#340#410#0#PHP" />
+            <element signature="e#379#449#0#PHP" />
+            <element signature="e#546#788#0#PHP" />
+            <element signature="e#849#1110#0#PHP" />
+            <element signature="e#1306#1590#0#PHP" />
+            <element signature="e#1829#1896#0#PHP" />
+            <element signature="e#2192#2251#0#PHP" />
+            <element signature="e#2254#2309#0#PHP" />
+            <element signature="e#2429#2504#0#PHP" />
+            <element signature="e#3023#3108#0#PHP" />
+            <element signature="e#3124#3230#0#PHP" />
+            <element signature="e#3234#3357#0#PHP" />
+            <element signature="e#3618#3696#0#PHP" />
+            <element signature="e#3731#3764#0#PHP" />
+            <element signature="e#3935#4147#0#PHP" />
+            <element signature="e#4011#4142#0#PHP" />
+            <element signature="e#4052#4141#0#PHP" />
+            <element signature="e#4333#4414#0#PHP" />
+            <element signature="e#4448#4481#0#PHP" />
+            <element signature="e#4849#4979#0#PHP" />
+            <element signature="e#4890#4978#0#PHP" />
+            <element signature="e#5077#5110#0#PHP" />
+            <element signature="e#5114#5166#0#PHP" />
+            <element signature="e#5363#5596#0#PHP" />
+            <element signature="e#5539#5596#0#PHP" />
+            <element signature="e#5664#5730#0#PHP" />
+            <element signature="e#5765#5849#0#PHP" />
+            <element signature="e#6033#6350#0#PHP" />
+            <element signature="e#6266#6350#0#PHP" />
+            <element signature="e#6617#6650#0#PHP" />
+            <element signature="e#6654#9500#0#PHP" />
+            <element signature="e#6782#6870#0#PHP" />
+            <element signature="e#6928#6963#0#PHP" />
+            <element signature="e#6968#7217#0#PHP" />
+            <element signature="e#7224#8893#0#PHP" />
+            <element signature="e#7268#7326#0#PHP" />
+            <element signature="e#7409#7755#0#PHP" />
+            <element signature="e#7524#7657#0#PHP" />
+            <element signature="e#7760#8656#0#PHP" />
+            <element signature="e#7805#8650#0#PHP" />
+            <element signature="e#7865#8026#0#PHP" />
+            <element signature="e#8108#8642#0#PHP" />
+            <element signature="e#8152#8450#0#PHP" />
+            <element signature="e#8661#8889#0#PHP" />
+            <element signature="e#8896#9500#0#PHP" />
+            <element signature="e#8999#9060#0#PHP" />
+            <element signature="e#9065#9129#0#PHP" />
+            <element signature="e#9134#9418#0#PHP" />
+            <element signature="e#9854#9907#0#PHP" />
+            <element signature="e#9912#10155#0#PHP" />
+            <element signature="e#10177#10253#0#PHP" />
+            <element signature="e#10322#10462#0#PHP" />
+            <element signature="e#10533#10675#0#PHP" />
+            <element signature="e#10742#10880#0#PHP" />
+            <element signature="e#10903#11202#0#PHP" />
+            <element signature="e#10960#11174#1#PHP" />
+            <element signature="e#11217#11294#0#PHP" />
+            <element signature="e#11258#11289#1#PHP" />
+            <element signature="e#11444#11497#0#PHP" />
+            <element signature="e#11524#12828#0#PHP" />
+            <element signature="e#11688#12224#0#PHP" />
+            <element signature="e#11736#12218#0#PHP" />
+            <element signature="e#11761#11904#0#PHP" />
+            <element signature="e#11914#12058#0#PHP" />
+            <element signature="e#12068#12210#0#PHP" />
+            <element signature="e#12229#12824#0#PHP" />
+            <element signature="e#12302#12818#0#PHP" />
+            <element signature="e#12415#12810#0#PHP" />
+            <element signature="e#12630#12810#0#PHP" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../date/date_views/includes/date_views_argument_handler_simple.inc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="141" column="8" selection-start-line="141" selection-start-column="8" selection-end-line="141" selection-end-column="8" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/datex_date.inc">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="864">
-          <caret line="307" column="62" selection-start-line="307" selection-start-column="62" selection-end-line="307" selection-end-column="62" />
+        <state relative-caret-position="432">
+          <caret line="110" column="27" selection-start-line="110" selection-start-column="27" selection-end-line="110" selection-end-column="27" />
           <folding>
-            <element signature="e#514#582#0#PHP" />
-            <element signature="e#749#1302#0#PHP" />
-            <element signature="e#831#1135#0#PHP" />
-            <element signature="e#979#1104#0#PHP" />
-            <element signature="e#1032#1098#0#PHP" />
-            <element signature="e#1275#1302#0#PHP" />
-            <element signature="e#1626#1951#0#PHP" />
-            <element signature="e#1649#1793#0#PHP" />
-            <element signature="e#1798#1921#0#PHP" />
-            <element signature="e#1926#2048#0#PHP" />
-            <element signature="e#2053#2104#0#PHP" />
-            <element signature="e#1539#2169#0#PHP" />
-            <element signature="e#1672#1813#0#PHP" />
-            <element signature="e#1816#1933#0#PHP" />
-            <element signature="e#1936#2134#0#PHP" />
-            <element signature="e#2137#2169#0#PHP" />
-            <element signature="e#2442#2491#0#PHP" />
-            <element signature="e#1947#1997#0#PHP" />
-            <element signature="e#2087#2166#0#PHP" />
-            <element signature="e#3458#3527#0#PHP" />
-            <element signature="e#3656#3846#0#PHP" />
-            <element signature="e#3705#3813#0#PHP" />
-            <element signature="e#3816#3846#0#PHP" />
-            <element signature="e#3983#4023#0#PHP" />
-            <element signature="e#4062#4118#0#PHP" />
-            <element signature="e#2968#3024#0#PHP" />
-            <element signature="e#4321#4720#0#PHP" />
+            <element signature="n#_datex_granularity_supported#0;n#!!top" expanded="true" />
+            <element signature="e#633#701#0#PHP" />
+            <element signature="n#_datex_date_field_granularity#0;n#!!top" expanded="true" />
+            <element signature="e#907#1327#0#PHP" />
+            <element signature="e#989#1293#0#PHP" />
+            <element signature="e#1137#1262#0#PHP" />
+            <element signature="e#1190#1256#0#PHP" />
+            <element signature="e#1296#1327#0#PHP" />
+            <element signature="e#1452#1934#0#PHP" />
+            <element signature="e#1475#1619#0#PHP" />
+            <element signature="e#1624#1747#0#PHP" />
+            <element signature="e#1752#1874#0#PHP" />
+            <element signature="e#1879#1930#0#PHP" />
+            <element signature="e#2145#2279#0#PHP" />
+            <element signature="e#2215#2356#0#PHP" />
+            <element signature="e#2359#2476#0#PHP" />
+            <element signature="e#2479#2677#0#PHP" />
+            <element signature="e#2680#2712#0#PHP" />
+            <element signature="e#2884#2938#0#PHP" />
+            <element signature="e#3067#3152#0#PHP" />
+            <element signature="e#3457#3526#0#PHP" />
+            <element signature="e#3655#3845#0#PHP" />
+            <element signature="e#3704#3812#0#PHP" />
+            <element signature="e#3815#3845#0#PHP" />
+            <element signature="e#3982#4022#0#PHP" />
+            <element signature="e#4061#4117#0#PHP" />
+            <element signature="e#4272#4318#0#PHP" />
+            <element signature="e#4321#4734#0#PHP" />
             <element signature="e#4737#5084#0#PHP" />
-            <element signature="e#3787#3850#0#PHP" />
-            <element signature="e#3854#4219#0#PHP" />
-            <element signature="e#4873#4958#0#PHP" />
-            <element signature="e#6820#6853#0#PHP" />
-            <element signature="e#6930#7630#0#PHP" />
-            <element signature="e#6947#7094#0#PHP" />
-            <element signature="e#7100#7277#0#PHP" />
-            <element signature="e#5778#5799#0#PHP" />
-            <element signature="e#6385#6473#0#PHP" />
-            <element signature="e#6431#6464#0#PHP" />
-            <element signature="e#6734#6807#0#PHP" />
-            <element signature="e#8617#9238#0#PHP" />
-            <element signature="e#9079#9234#0#PHP" />
-            <element signature="e#9243#9815#0#PHP" />
-            <element signature="e#9582#9722#0#PHP" />
-            <element signature="e#9728#9811#0#PHP" />
-            <element signature="e#9818#10309#0#PHP" />
-            <element signature="e#10038#10114#0#PHP" />
-            <element signature="e#10121#10214#0#PHP" />
-            <element signature="e#10220#10305#0#PHP" />
-            <element signature="e#10312#10482#0#PHP" />
-            <element signature="e#10397#10478#0#PHP" />
-            <element signature="e#10732#10765#0#PHP" />
-            <element signature="e#9468#9976#0#PHP" />
-            <element signature="e#11315#11492#0#PHP" />
-            <element signature="e#11761#11810#0#PHP" />
-            <element signature="e#11814#12116#0#PHP" />
-            <element signature="e#12120#12473#0#PHP" />
-            <element signature="e#12160#12469#0#PHP" />
-            <element signature="e#12636#12685#0#PHP" />
-            <element signature="e#12689#12874#0#PHP" />
-            <element signature="e#12748#12870#0#PHP" />
-            <element signature="e#13052#13101#0#PHP" />
-            <element signature="e#13547#13897#0#PHP" />
-            <element signature="e#13633#13725#0#PHP" />
-            <element signature="e#11781#12148#0#PHP" />
-            <element signature="e#11816#12132#0#PHP" />
-            <element signature="e#12022#12125#1#PHP" />
-            <element signature="e#14081#14130#0#PHP" />
-            <element signature="e#14134#14240#0#PHP" />
-            <element signature="e#14243#14345#0#PHP" />
-            <element signature="e#14512#14561#0#PHP" />
-            <element signature="e#12808#13468#0#PHP" />
-            <element signature="e#12924#13214#0#PHP" />
-            <element signature="e#13117#13216#1#PHP" />
-            <element signature="e#13222#13468#0#PHP" />
-            <element signature="e#13257#13463#0#PHP" />
-            <element signature="e#15308#15357#0#PHP" />
+            <element signature="e#5163#5209#0#PHP" />
+            <element signature="e#5212#5376#0#PHP" />
+            <element signature="e#5591#5676#0#PHP" />
+            <element signature="e#5732#5765#0#PHP" />
+            <element signature="e#5842#6581#0#PHP" />
+            <element signature="e#5859#6006#0#PHP" />
+            <element signature="e#6012#6189#0#PHP" />
+            <element signature="e#6196#6217#0#PHP" />
+            <element signature="e#6711#6789#0#PHP" />
+            <element signature="e#6845#6878#0#PHP" />
+            <element signature="e#7148#7221#0#PHP" />
+            <element signature="e#7577#8005#0#PHP" />
+            <element signature="e#7763#8001#0#PHP" />
+            <element signature="e#8009#8581#0#PHP" />
+            <element signature="e#8348#8488#0#PHP" />
+            <element signature="e#8494#8577#0#PHP" />
+            <element signature="e#8584#9074#0#PHP" />
+            <element signature="e#8804#8880#0#PHP" />
+            <element signature="e#8886#8979#0#PHP" />
+            <element signature="e#8985#9070#0#PHP" />
+            <element signature="e#9077#9293#0#PHP" />
+            <element signature="e#9208#9289#0#PHP" />
+            <element signature="n#datex_date_formatter_dates_alter#0;n#!!top" expanded="true" />
+            <element signature="e#9842#10019#0#PHP" />
+            <element signature="e#10288#10337#0#PHP" />
+            <element signature="e#10341#10643#0#PHP" />
+            <element signature="e#10646#10999#0#PHP" />
+            <element signature="e#10686#10995#0#PHP" />
+            <element signature="e#11162#11211#0#PHP" />
+            <element signature="e#11215#11400#0#PHP" />
+            <element signature="e#11274#11396#0#PHP" />
+            <element signature="e#11578#11627#0#PHP" />
+            <element signature="e#11742#12344#0#PHP" />
+            <element signature="e#11820#11976#0#PHP" />
+            <element signature="e#11984#12344#0#PHP" />
+            <element signature="e#12019#12339#0#PHP" />
+            <element signature="e#12225#12332#1#PHP" />
+            <element signature="e#12528#12577#0#PHP" />
+            <element signature="e#12581#12687#0#PHP" />
+            <element signature="e#12690#12792#0#PHP" />
+            <element signature="e#12959#13008#0#PHP" />
+            <element signature="e#13012#13680#0#PHP" />
+            <element signature="e#13123#13421#0#PHP" />
+            <element signature="e#13316#13414#1#PHP" />
+            <element signature="e#13429#13680#0#PHP" />
+            <element signature="e#13464#13675#0#PHP" />
+            <element signature="e#13842#13891#0#PHP" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../views/handlers/views_handler_argument_date.inc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="25" column="42" selection-start-line="25" selection-start-column="42" selection-end-line="25" selection-end-column="42" />
+          <folding>
+            <element signature="n#views_handler_argument_date#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/files/say">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="96">
+          <caret line="4" column="72" selection-start-line="4" selection-start-column="72" selection-end-line="4" selection-end-column="72" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../views/handlers/views_handler_argument.inc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-480">
+          <caret line="35" column="6" selection-start-line="35" selection-start-column="6" selection-end-line="35" selection-end-column="6" />
+          <folding>
+            <element signature="e#1233#43315#0#PHP" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../views/handlers/views_handler_argument_formula.inc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="17" column="65" selection-start-line="17" selection-start-column="65" selection-end-line="17" selection-end-column="65" />
+          <folding>
+            <element signature="n#views_handler_argument_formula#0;n#!!top" expanded="true" />
+            <element signature="n#construct#0;n#views_handler_argument_formula#0;n#!!top" expanded="true" />
+            <element signature="e#534#636#0#PHP" />
+            <element signature="n#query#0;n#views_handler_argument_formula#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/plugins/php/lib/php.jar!/stubs/standard/standard_1.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="444">
+          <caret line="394" column="2" selection-start-line="394" selection-start-column="2" selection-end-line="394" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../views/modules/node/views_handler_argument_dates_various.inc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="10" column="6" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
+          <folding>
+            <element signature="n#views_handler_argument_node_created_fulldate#0;n#!!top" expanded="true" />
+            <element signature="n#construct#0;n#views_handler_argument_node_created_fulldate#0;n#!!top" expanded="true" />
+            <element signature="n#views_handler_argument_node_created_year#0;n#!!top" expanded="true" />
+            <element signature="n#views_handler_argument_node_created_year_month#0;n#!!top" expanded="true" />
+            <element signature="n#construct#0;n#views_handler_argument_node_created_year_month#0;n#!!top" expanded="true" />
+            <element signature="n#views_handler_argument_node_created_day#0;n#!!top" expanded="true" />
+            <element signature="n#construct#0;n#views_handler_argument_node_created_day#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/datex.views.inc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="624">
+          <caret line="431" column="11" selection-start-line="431" selection-start-column="11" selection-end-line="431" selection-end-column="11" />
+          <folding>
+            <element signature="e#93#164#0#PHP" />
+            <element signature="n#datex_views_data_alter#0;n#!!top" expanded="true" />
+            <element signature="e#260#339#0#PHP" />
+            <element signature="e#384#451#0#PHP" />
+            <element signature="e#455#527#0#PHP" />
+            <element signature="e#1342#1441#0#PHP" />
+            <element signature="e#2228#2294#0#PHP" />
+            <element signature="e#2394#2431#0#PHP" />
+            <element signature="e#2437#2542#0#PHP" />
+            <element signature="e#2528#2707#0#PHP" />
+            <element signature="n#_datex_views_handler_argument_node_created_year_month#0;n#!!top" expanded="true" />
+            <element signature="n#_datex_process#0;n#_datex_views_handler_argument_node_created_year_month#0;n#!!top" expanded="true" />
+            <element signature="e#3241#3307#0#PHP" />
+            <element signature="e#3407#3444#0#PHP" />
+            <element signature="e#3705#3840#0#PHP" />
+            <element signature="e#3636#3751#0#PHP" />
+            <element signature="e#3815#3891#0#PHP" />
+            <element signature="e#4363#4542#0#PHP" />
+            <element signature="n#_datex_views_handler_argument_node_created_fulldate#0;n#!!top" expanded="true" />
+            <element signature="e#4786#4852#0#PHP" />
+            <element signature="e#4952#4989#0#PHP" />
+            <element signature="e#5251#5356#0#PHP" />
+            <element signature="e#5360#5436#0#PHP" />
+            <element signature="e#5616#5692#0#PHP" />
+            <element signature="e#5908#6087#0#PHP" />
+            <element signature="e#2444#2588#0#PHP" />
+            <element signature="e#3048#3279#0#PHP" />
+            <element signature="e#3437#3617#0#PHP" />
+            <element signature="e#3663#3721#0#PHP" />
+            <element signature="e#3914#3975#0#PHP" />
+            <element signature="e#4060#4219#0#PHP" />
+            <element signature="e#4175#4219#0#PHP" />
+            <element signature="e#4224#4283#0#PHP" />
+            <element signature="e#4964#5181#0#PHP" />
+            <element signature="e#5044#5115#0#PHP" />
+            <element signature="e#5211#5245#0#PHP" />
+            <element signature="e#5274#5485#0#PHP" />
+            <element signature="e#5516#5763#0#PHP" />
+            <element signature="e#5961#6029#0#PHP" />
+            <element signature="n#exposed_validate#0;n#_datex_views_handler_filter_date#0;n#!!top" expanded="true" />
+            <element signature="e#6579#7180#0#PHP" />
+            <element signature="e#6674#6816#0#PHP" />
+            <element signature="e#6827#7180#0#PHP" />
+            <element signature="e#6920#7024#0#PHP" />
+            <element signature="e#7070#7174#0#PHP" />
+            <element signature="e#7774#8112#0#PHP" />
+            <element signature="e#7891#8043#0#PHP" />
+            <element signature="e#8396#8552#0#PHP" />
           </folding>
         </state>
       </provider>

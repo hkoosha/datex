@@ -5,10 +5,14 @@
       <w>datex</w>
       <w>farvardin</w>
       <w>fissle</w>
+      <w>fulldate</w>
       <w>fval</w>
       <w>granul</w>
       <w>granularities</w>
       <w>hussle</w>
+      <w>strtotime</w>
+      <w>tmsg</w>
+      <w>tvar</w>
     </words>
   </dictionary>
 </component>

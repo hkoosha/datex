@@ -76,7 +76,10 @@ function _datex_date_field_has_granularity(array $element, $granul) {
  */
 function _datex_date_field_schema($e) {
   $ret = NULL;
-  if (isset($elementp['#instance']['settings']['datex_schema'])) {
+  if (isset($e['datex_schema'])) {
+    $ret = $e['datex_schema'];
+  }
+  elseif (isset($elementp['#instance']['settings']['datex_schema'])) {
     $ret = $element['#instance']['settings']['datex_schema'];
   }
   elseif (isset($e['#instance']['widget']['settings']['datex_schema'])) {
@@ -85,27 +88,27 @@ function _datex_date_field_schema($e) {
   elseif (isset($e['display']['settings']['datex_schema'])) {
     $ret = $e['display']['settings']['datex_schema'];
   }
-  elseif (isset($e['view_mode']) &&
-    $e['instance']['display'][$e['view_mode']]['settings']['datex_schema']) {
+  elseif (isset($e['view_mode']) && !empty($e['instance']['display'][$e['view_mode']]['settings']['datex_schema'])) {
     $ret = $e['instance']['display'][$e['view_mode']]['settings']['datex_schema'];
   }
   else {
     $ret = 'default';
   }
-  return $ret ? $ret : 'default';
+  return empty($ret) ? 'default' : $ret;
 }
 
 /**
  * Create a datex-calendar based on field config and the schema set for it.
  */
-function _datex_date_field_calendar($element) {
+function _datex_date_field_calendar($element, $check_granularity = TRUE) {
+  $is = isset($element['datex_schema']);
   if (_datex_is_disabled('date')) {
     return NULL;
   }
   if (_datex_date_field_schema($element) === 'disabled') {
     return NULL;
   }
-  if (!_datex_granularity_supported(_datex_date_field_granularity($element))) {
+  if ($check_granularity && !_datex_granularity_supported(_datex_date_field_granularity($element))) {
     return NULL;
   }
 
