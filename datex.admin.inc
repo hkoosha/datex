@@ -1,5 +1,33 @@
 <?php
 
+function _datex_checks(&$form, $who, $boxes) {
+  foreach ($boxes as $box) {
+    $f[$who][$box] = [
+      '#type' => 'checkbox',
+      '#title' => $box,
+    ];
+  }
+}
+
+function _datex_selects(&$form, $who, $boxes) {
+  foreach ($boxes as $box => $options) {
+    $f[$who][$box] = [
+      '#title' => $box,
+      '#type' => 'select',
+      '#options' => drupal_map_assoc($options),
+    ];
+  }
+}
+
+function _datex_fieldset(&$form, $title) {
+  $f[$title] = [
+    '#type' => 'fieldset',
+    '#title' => explode('_', $title)[0],
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  ];
+}
+
 /**
  * Do not translate anything here, as the original documentation is not.
  */
@@ -15,15 +43,58 @@ function datex_popup_admin_form($f, $fs) {
       '</h2><br>',
   ];
 
+  // -----------------------------------------------
+
+  $w = 'general_fieldset';
+  _datex_fieldset($f, $w);
+
   $boxes = [
     'inline',
     'responsive',
     'autoClose',
     'onlySelectOnDate',
+    'observer',
   ];
-  foreach ($boxes as $box) {
-    $f['pu_' . $box] = ['#type' => 'checkbox', '#title' => $box,];
-  }
+  _datex_checks($f, $w, $boxes);
+
+  $boxes = [
+    'viewMode' => ['day', 'month', 'year'],
+  ];
+  _datex_selects($f, $w, $boxes);
+
+  $boxes = [
+    'format',
+    'altFormat',
+    'minDate',
+    'maxDate',
+    'inputDelay',
+  ];
+  _datex_checks($f, $w, $boxes);
+
+  // -----------------------------------------------
+
+  $w = 'calendar_fieldset';
+  _datex_fieldset($f, $w);
+
+  $boxes = [
+    'persianShowHint' => ['fa', 'en'],
+    'gregorianShowHint' => ['fa', 'en'],
+    'persianLeapYear' => ['algorithmic', 'astronomical'],
+  ];
+  _datex_selects($f, $w, $boxes);
+
+  // -----------------------------------------------
+
+  $w = 'picker_fieldset'
+  _datex_fieldset($f, $w);
+
+  $boxes = [
+    'yearPicker',
+    'monthPicker',
+    'dayPicker',
+  ];
+  _datex_checks($f, $w, $boxes);
+
 
   $f['actions']['submit'] = [
     '#type' => 'submit',
@@ -93,6 +164,37 @@ function datex_admin_form($form, $form_state) {
     '#required' => FALSE,
   ];
 
+  $form['mode_fieldset'] = [
+    '#type' => 'fieldset',
+    '#title' => t('Mode'),
+    '#collapsible' => !_datex_is_patching_mode() && DATEX_USE_INTL ? TRUE : FALSE,
+    '#collapsed' => !_datex_is_patching_mode() && DATEX_USE_INTL ? TRUE : FALSE,
+  ];
+  $form['mode_fieldset']['datex_api_intl_status'] = [
+    '#type' => 'markup',
+    '#title' => t('PHP-Intl status'),
+    '#markup' => !DATEX_USE_INTL
+      ? t('<b>PHP-Intl is not available in this environment. It is ' .
+        "highly recommended that you enable it, else you'll have limited " .
+        "functionality.</b>")
+      : t('PHP-Intl is available.'),
+  ];
+  $form['mode_fieldset']['datex_mode'] = [
+    '#type' => 'radios',
+    '#title' => t('Date integration mode'),
+    '#default_value' => _datex_is_patching_mode() ? 1 : 0,
+    '#description' => t('The mode which datex uses to integrate with ' .
+      'Drupal. Patching mode needs patching a core file and might be needed ' .
+      'in some rare extreme cases. It is unsafe and dangerous! ' .
+      'It is highly recommended to use non-patching mode.' .
+      "- <b>NOT RECOMMENDED</b>, you've been warned"
+    ),
+    '#options' => [
+      0 => t('Operate in non-patching mode'),
+      1 => t('Operate in patching mode (Patching of the file "common.inc" is required)'),
+    ],
+  ];
+
   $disablable = [
     'datex' => t('Datex (globally)'),
     'views' => t('Views (date field handler, only applicable in' .
@@ -134,44 +236,12 @@ function datex_admin_form($form, $form_state) {
     '#options' => $disablable,
   ];
 
-  $form['mode_fieldset'] = [
-    '#type' => 'fieldset',
-    '#title' => t('Mode'),
-    '#collapsible' => !_datex_is_patching_mode() && DATEX_USE_INTL ? TRUE : FALSE,
-    '#collapsed' => !_datex_is_patching_mode() && DATEX_USE_INTL ? TRUE : FALSE,
-  ];
-  $form['mode_fieldset']['datex_api_intl_status'] = [
-    '#type' => 'markup',
-    '#title' => t('PHP-Intl status'),
-    '#markup' => !DATEX_USE_INTL
-      ? t('<b>PHP-Intl is not available in this environment. It is ' .
-        "highly recommended that you enable it, else you'll have limited " .
-        "functionality.</b>")
-      : t('PHP-Intl is available.'),
-  ];
-  $form['mode_fieldset']['datex_mode'] = [
-    '#type' => 'radios',
-    '#title' => t('Date integration mode'),
-    '#default_value' => _datex_is_patching_mode() ? 1 : 0,
-    '#description' => t('The mode which datex uses to integrate with ' .
-      'Drupal. Patching mode needs patching a core file and might be needed ' .
-      'in some rare extreme cases. It is unsafe and dangerous! ' .
-      'It is highly recommended to use non-patching mode.' .
-      "- <b>NOT RECOMMENDED</b>, you've been warned"
-    ),
-    '#options' => [
-      0 => t('Operate in non-patching mode'),
-      1 => t('Operate in patching mode (Patching of the file "common.inc" is required)'),
-    ],
-  ];
-
   $form['actions']['submit'] = [
     '#type' => 'submit',
     '#submit' => ['_datex_admin_form_submit'],
     '#value' => t('Save'),
     '#name' => 'config',
   ];
-
   return $form;
 }
 

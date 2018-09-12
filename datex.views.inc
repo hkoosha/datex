@@ -70,6 +70,7 @@ function datex_views_data_alter(&$data) {
   }
 }
 
+
 // ============================================================================
 // ================================================================= CONTEXTUAL
 // ============================================================================
@@ -345,10 +346,6 @@ class _datex_views_handler_field_date extends views_handler_field_date {
     $calendar->setTimestamp($value);
     return $calendar->format($format);
   }
-
-  //    $format = $this->options['date_format'] === 'custom'
-  //      ? $this->options['custom_date_format']
-  //      : variable_get('date_format_' . $this->options['date_format']);
 
 }
 

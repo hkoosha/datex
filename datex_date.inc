@@ -329,7 +329,7 @@ function datex_date_formatter_dates_alter(&$dates, $context) {
   }
 }
 
-// ______________________________________________________________________ HELLO
+// _________________________________________________ HELLO, INTRODUCE OURSELVES
 
 /**
  * Adds datex as a date form element validator.
