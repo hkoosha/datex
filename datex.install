@@ -33,7 +33,7 @@ function datex_install() {
     ]
   ]);
   variable_set('datex_mode', 0);
-  variable_set('datex_popup_theme', '');
+  variable_set('datex_popup_js', '');
 
   $comp = [];
   foreach (_datex_components() as $name) {
@@ -48,6 +48,7 @@ function datex_uninstall() {
     'datex_mode',
     'datex_popup_theme',
     'datex_disable',
+    'datex_popup_js',
   ];
   foreach ($del as $var) {
     variable_del($var);

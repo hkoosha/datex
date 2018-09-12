@@ -26,6 +26,14 @@ if (module_exists('date_views')) {
  * For admin forms.
  */
 function datex_menu() {
+  $items['admin/config/regional/date-time/datex-popup'] = [
+    'title' => 'Datex Popup',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['datex_popup_admin_form'],
+    'access arguments' => ['administer site configuration'],
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'datex.admin.inc',
+  ];
   $items['admin/config/regional/date-time/datex'] = [
     'title' => 'Datex',
     'page callback' => 'drupal_get_form',

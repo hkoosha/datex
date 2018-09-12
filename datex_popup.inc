@@ -1,74 +1,63 @@
 <?php
 
-define('DATEX_POPUP_VERSION', '1.2.1');
-define('DATEX_POPUP_RELATIVE_PATH', '/'); // /dist/js/ for 2.0.1
-define('DATEX_POPUP_RELATIVE_CSS_PATH', '/'); // /dist/css/ for 2.0.1
-
-function _datex_add_lib_cal($name) {
-  $name = _datex_language_calendar($name);
-  $lib_path = libraries_get_path('jquery_calendars');
-  $js_path = $lib_path . DATEX_POPUP_RELATIVE_PATH;
-
+function _datex_add_lib_cal() {
   static $self_loaded = FALSE;
   if (!$self_loaded) {
-    $l_load = libraries_load('jquery_calendars');
-    if (!$l_load['loaded']) {
-      return FALSE;
-    }
     $datex_module_path = drupal_get_path('module', 'datex');
-    drupal_add_js($datex_module_path . '/files/datex_popup.js');
-    drupal_add_css($datex_module_path . '/files/datex_popup.css');
-    $theme = variable_get('datex_popup_theme', '');
-    if (!empty($theme)) {
-      $css_path = $lib_path . DATEX_POPUP_RELATIVE_CSS_PATH;
-      drupal_add_css($css_path . $theme);
-    }
+    drupal_add_js($datex_module_path . '/asset/persian-date.min.js');
+    drupal_add_js($datex_module_path . '/asset/persian-datepicker.min.js');
+    drupal_add_css($datex_module_path . '/asset/persian-datepicker.min.css');
   }
-
-  if (isset($GLOBALS['datex_calendars'][$name])) {
-    return TRUE;
-  }
-
-  switch ($name) {
-    case 'ethiopic':
-      $name = 'ethiopian';
-      break;
-
-    case 'persian':
-    case 'islamic':
-    case 'hebrew':
-    case 'coptic':
-      break;
-  }
-  drupal_add_js($js_path . 'jquery.calendars.' . $name . '.js');
-
-  $lang = $GLOBALS['language']->language;
-  if ($lang !== 'en') {
-    $add = [
-      $js_path . 'jquery.calendars.picker-' . $lang . '.js',
-      $js_path . 'jquery.calendars-' . $lang . '.js',
-      $js_path . 'jquery.calendars.' . $name . '-' . $lang . '.js',
-    ];
-    foreach ($add as $item) {
-      if (file_exists($item)) {
-        drupal_add_js($item);
-      }
-    }
-  }
-
-  $GLOBALS['datex_calendars'][$name] = TRUE;
-  return TRUE;
 }
 
 /**
- * Read the default date from field, set the read time on datex object.
+ * Implements hook_js_alter().
+ *
+ * Whenever date_popup.js is loaded, Remove it and inject datex library.
  */
-function _datex_set_calendar_time_from_field_default_value($element, DatexInterface $calendar) {
-  $d = date_default_date($element);
-  if ($d) {
-    $calendar->setTimestamp($d->getTimestamp());
+function datex_js_alter(&$js) {
+  if (_datex_is_disabled('js')) {
+    return;
+  }
+
+  foreach (array_keys($js) as $each) {
+    foreach ([
+               'locale.datepicker.js',
+               'date_popup.js',
+               'jquery.ui.datepicker.min.js',
+             ] as $unset) {
+      if (strpos($each, $unset) !== FALSE) {
+        unset($js[$each]);
+        // instead use ours
+        _datex_add_lib_cal();
+      }
+    }
   }
 }
+
+/**
+ * Implements hook_css_alter().
+ */
+function datex_css_alter(&$css) {
+  if (_datex_is_disabled('js')) {
+    return;
+  }
+
+  foreach (array_keys($css) as $each) {
+    foreach ([
+               'jquery.ui.datepicker.css',
+               'date_popup',
+             ] as $unset) {
+      if (strpos($each, $unset) !== FALSE) {
+        unset($css[$each]);
+        // instead use ours
+        _datex_add_lib_cal();
+      }
+    }
+  }
+}
+
+// ----------------------------------------------------------------------------
 
 function _datex_popupify(&$element, DatexInterface $calendar, $date_format, $hidden_value) {
   if (_datex_is_disabled('popup')) {
@@ -76,22 +65,11 @@ function _datex_popupify(&$element, DatexInterface $calendar, $date_format, $hid
   }
 
   $schema = _datex_date_field_schema($element);
-  _datex_add_lib_cal($schema);
 
-  $name = _datex_language_calendar($schema);
-  switch ($name) {
-    case 'ethiopic':
-      $name = 'ethiopian';
-      break;
-
-    case 'persian':
-    case 'islamic':
-    case 'hebrew':
-    case 'coptic':
-      break;
-  };
-
-  _datex_set_calendar_time_from_field_default_value($element, $calendar);
+  $d = date_default_date($element);
+  if ($d) {
+    $calendar->setTimestamp($d->getTimestamp());
+  }
   $def = $calendar->format('Y-n-j');
 
   list($from, $to) = date_range_years($element['#date_year_range']);
@@ -114,14 +92,6 @@ function _datex_popupify(&$element, DatexInterface $calendar, $date_format, $hid
   ];
   $date_format = strtr($date_format, $replace);
 
-  $s['minDate'] = $from;
-  $s['maxDate'] = $to;
-  $s['calendar'] = _datex_language_calendar(_datex_date_field_schema($element));
-  $s['dir'] = $GLOBALS['language']->direction ? 'topRight' : 'topLeft';
-  $s['langcode'] = $GLOBALS['language']->language;
-  $s['langcode'] = 'fa';
-  $s['calendar'] = $name;
-  $s['fmt'] = $date_format;
   $s['def'] = $def;
 
   $p = array_values($element['#parents']);
@@ -135,89 +105,6 @@ function _datex_popupify(&$element, DatexInterface $calendar, $date_format, $hid
   foreach ($s as $name => $item) {
     $element['datex_hidden']['#attributes']['data-datex-' . $name][] = $item;
   }
-}
-
-/**
- * Imlements hook_js_alter().
- *
- * Whenever date_popup.js is loaded, Remove it and inject datex library.
- */
-function datex_js_alter(&$js) {
-  if (_datex_is_disabled('js')) {
-    return;
-  }
-  foreach (array_keys($js) as $path) {
-    foreach ([
-               'locale.datepicker.js',
-               'date_popup.js',
-               'jquery.ui.datepicker.min.js',
-             ] as $unset) {
-      // TODO minus?
-      // TODO non-min?
-      if (substr($path, -strlen($unset)) === $unset) {
-        unset($js[$path]);
-      }
-    }
-  }
-}
-
-/**
- * Implements hook_css_alter().
- */
-function datex_css_alter(&$css) {
-  if (_datex_is_disabled('js')) {
-    return;
-  }
-  foreach (array_keys($css) as $each) {
-    foreach ([
-               'jquery.ui.datepicker.css',
-               'date_popup',
-             ] as $unset) {
-      if (strpos($each, $unset) !== FALSE) {
-        unset($css[$each]);
-      }
-    }
-  }
-}
-
-/**
- * Implements hook_libraries_info().
- *
- * jQuery World Calendar, by keith wood. http://keith-wood.name
- */
-function datex_libraries_info() {
-  if (_datex_is_disabled('libraries')) {
-    return [];
-  }
-  $version = DATEX_POPUP_VERSION;
-  $libraries['jquery_calendars'] = [
-    'name' => t('jQuery Calendars'),
-    'vendor url' => 'http://keith-wood.name',
-    'download url' => 'http://keith-wood.name/calendars.html',
-    'download file url' => 'https://github.com/kbwood/calendars/archive/' . $version . '.tar.gz',
-    'version' => $version,
-    'version argumentsx' => [
-      'file' => 'jquery.calendars.all.js',
-      'pattern' => '#v(\\d\\.\\d\\.\\d)\\.#',
-      'lines' => 2,
-    ],
-    'path' => DATEX_POPUP_RELATIVE_PATH,
-    'files' => [
-      'js' => [
-        'jquery.calendars.all.min.js',
-      ],
-    ],
-    'variants' => [
-      'normal' => [
-        'files' => [
-          'js' => [
-            'jquery.calendars.all.js',
-          ],
-        ],
-      ],
-    ],
-  ];
-  return $libraries;
 }
 
 function _datex_popup_set_hidden_date_on_calendar(DatexInterface $calendar, $hval, $g) {

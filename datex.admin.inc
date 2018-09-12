@@ -1,71 +1,50 @@
 <?php
 
+/**
+ * Do not translate anything here, as the original documentation is not.
+ */
+function datex_popup_admin_form($f, $fs) {
+  $targ = ['@url' => url('https://babakhani.github.io/PersianWebToolkit/doc/datepicker/playground.html')];
+  $f['popup_description'] = [
+    '#type' => 'markup',
+    '#markup' =>
+      '<br><h2>' .
+      t('JS popup default configurations') .
+      ' ' .
+      t('visit <a href="@url">Play Ground</a> to get an idea of how these options work.', $targ) .
+      '</h2><br>',
+  ];
+
+  $boxes = [
+    'inline',
+    'responsive',
+    'autoClose',
+    'onlySelectOnDate',
+  ];
+  foreach ($boxes as $box) {
+    $f['pu_' . $box] = ['#type' => 'checkbox', '#title' => $box,];
+  }
+
+  $f['actions']['submit'] = [
+    '#type' => 'submit',
+    '#submit' => ['_datex_popup_admin_form_submit'],
+    '#value' => t('Save'),
+    '#name' => 'config',
+  ];
+  return $f;
+}
+
+function _datex_popup_admin_form_submit($f, &$fs) {
+  $v = $form_state['values'];
+  drupal_set_message(t('Configuration saved.'));
+}
+
+// ----------------------------------------------------------------------------
 
 /**
  * Provides administration form for datex module (menu callback).
  */
 function datex_admin_form($form, $form_state) {
-
-  $disabled_options = [
-    'datex' => t('Datex (globally)'),
-    'views' => t('Views (date field handler, only applicable in' .
-      ' non-patching mode [hook_views_data_alter]'),
-    'datex_hook' => t('datex hook, only applicable in patching mode [hook_datex_format_alter]'),
-    'token' => t('Tokens [hook_token_info]'),
-    'libraries' => t('Libraries [hook_libraries_info]'),
-    'node' => t('Node ("published on" display) [hook_preprocess_node]'),
-    'node_edit' => t('Node Edit Form (authored on) [form_alter]'),
-    'node_admin' => t('Node admin ("updated" column display)[via hook_form_alter]'),
-    'comment' => t('Comment ("published on" display) [hook_preprocess_comment]'),
-    'comment_edit' => t('Comment Edit Form (authored on) [form_alter]'),
-    'date' => t('date module (disables date_popup too)'),
-    'popup' => t("date_popup module"),
-    'js' => t("jQuery Calendar (loading the JS library into page) [drupal_add_js/libraries_load]"),
-  ];
-
-  $form['intl_fieldset'] = [
-    '#type' => 'fieldset',
-    '#description' => '',
-    '#title' => '',
-    '#collapsible' => FALSE,
-    '#collapsed' => FALSE,
-    '#group' => 'datex_config',
-  ];
-  $form['intl_fieldset']['datex_api_intl_status'] = [
-    '#type' => 'markup',
-    '#title' => t('PHP-Intl status'),
-    '#markup' => !DATEX_USE_INTL
-      ? t('<b>PHP-Intl is not available in this environment. It is ' .
-        "highly recommended that you enable it, else you'll have limited " .
-        'functionality for Jalali calendar only.</b>')
-      : t('PHP-Intl is available and will be used.'),
-  ];
-
-  $form['mode_fieldset'] = [
-    '#type' => 'fieldset',
-    '#description' => '',
-    '#title' => '',
-    '#collapsible' => FALSE,
-    '#collapsed' => FALSE,
-    '#group' => 'datex_config',
-  ];
-  $form['mode_fieldset']['datex_mode'] = [
-    '#type' => 'radios',
-    '#title' => t('Date integration mode'),
-    '#default_value' => _datex_is_patching_mode() ? 1 : 0,
-    '#description' => t('The mode which datex uses to integrate with ' .
-      'Drupal. Patching mode needs patching a core file, but will support ' .
-      'more modules and functionality. It is unsafe and dangerous! ' .
-      'It is highly recommended to use non-patching mode.'),
-    '#options' => [
-      0 => t('Operate in non-patching mode'),
-      1 => t('Operate in patching mode (Patching of the file "common.inc" is required)'),
-    ],
-  ];
-  if (_datex_is_patching_mode()) {
-    $form['mode_fieldset']['datex_mode']['#options'][1] .= ' - <b>' . t('Not recommended') . '</b>';
-  }
-
   $schema_options = [];
   foreach (array_keys(variable_get('datex_schema', [])) as $name) {
     $summary = '';
@@ -103,7 +82,6 @@ function datex_admin_form($form, $form_state) {
     '#header' => ['title' => t('Title'), 'summary' => t('Summary')],
     '#options' => $schema_options,
   ];
-
   $form['schema_manage']['datex_new_schema_machine_name'] = [
     '#title' => t('New schema'),
     '#type' => 'machine_name',
@@ -115,6 +93,22 @@ function datex_admin_form($form, $form_state) {
     '#required' => FALSE,
   ];
 
+  $disablable = [
+    'datex' => t('Datex (globally)'),
+    'views' => t('Views (date field handler, only applicable in' .
+      ' non-patching mode [hook_views_data_alter]'),
+    'datex_hook' => t('datex hook, only applicable in patching mode [hook_datex_format_alter]'),
+    'token' => t('Tokens [hook_token_info]'),
+    'libraries' => t('Libraries [hook_libraries_info]'),
+    'node' => t('Node ("published on" display) [hook_preprocess_node]'),
+    'node_edit' => t('Node Edit Form (authored on) [form_alter]'),
+    'node_admin' => t('Node admin ("updated" column display)[via hook_form_alter]'),
+    'comment' => t('Comment ("published on" display) [hook_preprocess_comment]'),
+    'comment_edit' => t('Comment Edit Form (authored on) [form_alter]'),
+    'date' => t('date module (disables date_popup too)'),
+    'popup' => t("date_popup module"),
+    'js' => t("jQuery Calendar (loading the JS library into page) [drupal_add_js/libraries_load]"),
+  ];
   $disabled = [];
   foreach (variable_get('datex_disable') as $name => $is_disabled) {
     if ($is_disabled) {
@@ -137,29 +131,38 @@ function datex_admin_form($form, $form_state) {
     '#type' => 'checkboxes',
     '#title' => '',
     '#default_value' => $disabled,
-    '#options' => $disabled_options,
+    '#options' => $disablable,
   ];
 
-  $form['popup_fieldset'] = [
+  $form['mode_fieldset'] = [
     '#type' => 'fieldset',
-    '#title' => t('Datex Popup (for date and date_popup module)'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-    '#group' => 'datex_config',
+    '#title' => t('Mode'),
+    '#collapsible' => !_datex_is_patching_mode() && DATEX_USE_INTL ? TRUE : FALSE,
+    '#collapsed' => !_datex_is_patching_mode() && DATEX_USE_INTL ? TRUE : FALSE,
   ];
-  $form['popup_fieldset']['datex_popup_supported_cal'] = [
-    '#title' => t('Supported calendars'),
-    '#type' => 'item',
-    '#markup' => t('Currently supported calendars by datex popup are:' .
-      ' Persian, Islamic, Hebrew, Coptic, Ethiopian.'),
+  $form['mode_fieldset']['datex_api_intl_status'] = [
+    '#type' => 'markup',
+    '#title' => t('PHP-Intl status'),
+    '#markup' => !DATEX_USE_INTL
+      ? t('<b>PHP-Intl is not available in this environment. It is ' .
+        "highly recommended that you enable it, else you'll have limited " .
+        "functionality.</b>")
+      : t('PHP-Intl is available.'),
   ];
-  $form['popup_fieldset']['datex_popup_css'] = [
-    '#title' => t('CSS theme'),
-    '#type' => 'select',
-    '#default_value' => variable_get('datex_popup_theme', ''),
-    '#options' => ['' => t('Do not add css files')]
-      + drupal_map_assoc(_datex_api_css_files_list()),
-    '#description' => t('If you want to add your custom theme, select "Do not add" from this list.'),
+  $form['mode_fieldset']['datex_mode'] = [
+    '#type' => 'radios',
+    '#title' => t('Date integration mode'),
+    '#default_value' => _datex_is_patching_mode() ? 1 : 0,
+    '#description' => t('The mode which datex uses to integrate with ' .
+      'Drupal. Patching mode needs patching a core file and might be needed ' .
+      'in some rare extreme cases. It is unsafe and dangerous! ' .
+      'It is highly recommended to use non-patching mode.' .
+      "- <b>NOT RECOMMENDED</b>, you've been warned"
+    ),
+    '#options' => [
+      0 => t('Operate in non-patching mode'),
+      1 => t('Operate in patching mode (Patching of the file "common.inc" is required)'),
+    ],
   ];
 
   $form['actions']['submit'] = [
@@ -178,10 +181,9 @@ function datex_admin_form($form, $form_state) {
  * This admin form could be implemented better.
  */
 function _datex_admin_form_submit($form, &$form_state) {
-
   $v = $form_state['values'];
   variable_set('datex_mode', $v['datex_mode'] == 1 || $v['datex_mode'] == '1' ? 1 : 0);
-  variable_set('datex_popup_theme', $v['datex_popup_css']);
+  variable_set('datex_popup_js', $v['datex_popup_js']);
 
   $schema = variable_get('datex_schema');
 
@@ -230,7 +232,7 @@ function _datex_admin_form_submit($form, &$form_state) {
     drupal_set_message(t('You must clear the caches for changes to take effect!'), 'warning');
   }
 
-  drupal_set_message(t('New configuration saved.'));
+  drupal_set_message(t('Configuration saved.'));
 
   if ($newName) {
     drupal_goto('admin/config/regional/date-time/datex/edit/' . $newName);

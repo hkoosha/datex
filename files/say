@@ -3,6 +3,9 @@ say it works though
 set timezone if time is wrong
 say it needs date_views
 say about node created limitation, year month, but not month is supported
+say go create fa lang
+
+it's 25 k  gzipped
 
 support for year+month but day+year
 
