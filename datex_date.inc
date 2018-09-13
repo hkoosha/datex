@@ -5,8 +5,6 @@
  * Provides support for date module.
  */
 
-define('DATEX_HIDDEN_VALUE_FMT', 'U'); //'Y-n-j H:m:s');
-
 // _____________________________________________________________________ HELPER
 
 /**
@@ -130,7 +128,15 @@ function _datex_date_field_calendar($element, $check_granularity = TRUE) {
 function _datex_get_fs(&$element, &$fs, $extra_parent = NULL, $is_input = TRUE) {
   $key = $is_input ? 'input' : 'value';
   if (!isset($fs[$key]) || !is_array($fs[$key])) {
-    return NULL;
+    if (!$is_input) {
+      $key = 'values';
+      if (!isset($fs[$key]) || !is_array($fs[$key])) {
+        return NULL;
+      }
+    }
+    else {
+      return NULL;
+    }
   }
 
   $dummy = NULL;

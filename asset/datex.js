@@ -123,10 +123,62 @@
         };
     }
 
-    function process(who, settings, id) {
-        var alt = '#datex-' + id;
-        var configStr = $(alt).attr('data-datex-config');
-        var c = configStr.split("|");
+    function timeSett(settings) {
+        return {
+            responsive: true,
+            persianDigit: false,
+            initialValue: false,
+            autoClose: true,
+            position: "auto",
+            onlyTimePicker: true,
+            calendarType: 'gregorian',
+            inputDelay: 800,
+            observer: true,
+            navigator: {
+                enabled: true,
+                scroll: {
+                    enabled: true
+                },
+                text: {
+                    btnNextText: "<",
+                    btnPrevText: ">"
+                }
+            },
+            toolbox: {
+                enabled: true,
+                calendarSwitch: {
+                    enabled: false,
+                },
+                todayButton: {
+                    enabled: false,
+                },
+                submitButton: {
+                    enabled: true,
+                },
+            },
+            timePicker: {
+                enabled: true,
+                hour: {
+                    enabled: true,
+                    step: settings.timeSteps[0]
+                },
+                minute: {
+                    enabled: true,
+                    step: settings.timeSteps[1]
+                },
+                second: {
+                    enabled: true,
+                    step: settings.timeSteps[2]
+                },
+                meridian: {
+                    enabled: true
+                }
+            },
+            format: settings.showSeconds ? 'H:m:s' : 'H:m',
+        };
+    }
+
+    function process(who, settings, id, c, alt) {
         var cfg = sett(
             alt,
             parseInt(c[0]), // min date
@@ -145,10 +197,21 @@
             c[13], // view mode
             c[14] // format
         );
-        var init = parseInt(c[15]);
         var pd = who.pDatepicker(cfg);
-        pd.setDate(init);
+        var init = parseInt(c[15]);
+        if (init >= 0) {
+            pd.setDate(init);
+        }
+    }
 
+    function processTime(who, settings, id) {
+        var cfg = timeSett(settings);
+        var pd = who.pDatepicker(cfg);
+        var init = who.attr('data-datex-init');
+        if (init >= 0) {
+            console.log(init);
+            pd.setDate(init);
+        }
     }
 
     function attach(ctx) {
@@ -157,9 +220,16 @@
                 continue;
             }
             var data = Drupal.settings.datePopup[id];
+            var find = $('#' + id);
+
             if (data.func === 'datepicker') {
-                var find = $('#' + id);
-                process(find, data.settings, id)
+                var alt = '#datex-' + id.replace('timeEntry', 'datepicker');
+                var configStr = $(alt).attr('data-datex-config');
+                var c = configStr.split("|");
+                process(find, data.settings, id, c, alt)
+            }
+            else {
+                processTime(find, data.settings, id)
             }
         }
     }

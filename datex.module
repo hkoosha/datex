@@ -125,8 +125,6 @@ function datex_datex_format_alter(&$data, $context) {
   }
 }
 
-// ___________________________________________________________ NODE AND COMMENT
-
 /**
  * Implements hook_preprocess_node().
  *
@@ -317,6 +315,17 @@ function datex_form_alter(&$f, &$fs, $form_id) {
       $f['author']['date']['#default_value'] = $calendar->format($fmt);
     }
     array_unshift($f['#validate'], '_datex_comment_edit_form_date_validate');
+  }
+}
+
+/**
+ * Implements hook_modules_installed().
+ *
+ * To make sure scheduler uses plain text field, which can be popupified.
+ */
+function datex_modules_installed($modules) {
+  if (variable_get('scheduler_field_type', NULL) !== NULL) {
+    variable_set('scheduler_field_type', 'textfield');
   }
 }
 

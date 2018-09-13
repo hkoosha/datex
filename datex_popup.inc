@@ -127,31 +127,49 @@ function _datex_date_popup_field_element_validate_callback(&$element, &$fs) {
 
   $def = date_default_date($element);
   $date_fmt = date_popup_date_format($element);
-  $g = date_popup_date_granularity($element);
+  $dg = date_popup_date_granularity($element);
+  $tg = date_popup_time_granularity($element);
 
-  if (!_datex_popup_extract_hidden_element($calendar, $hidden_value, $g)) {
+  if (!_datex_popup_extract_hidden_element($calendar, $hidden_value, $dg)) {
     form_set_error($element['#name'], t('Invalid date 0'));
     return;
   }
 
-
   $v = $calendar->xFormat($date_fmt);
-  dpm($v);
   _datex_set_fs($element, $fs, $v, 'date', TRUE);
   _datex_set_fs($element, $fs, $v, 'date', FALSE);
+
+
+  if ($v = _datex_get_fs($element, $fs, 'time', TRUE)) {
+    if (count(explode(':', $v)) === 3 && !in_array('second', $tg, TRUE)) {
+      $v = explode(':', $v);
+      unset($v[2]);
+      $v = implode(':', $v);
+      _datex_set_fs($element, $fs, $v, 'time', TRUE);
+    }
+  }
+  if ($v = _datex_get_fs($element, $fs, 'time', FALSE)) {
+    if (count(explode(':', $v)) === 3 && !in_array('second', $tg, TRUE)) {
+      $v = explode(':', $v);
+      unset($v[2]);
+      $v = implode(':', $v);
+      dpm($v);
+      _datex_set_fs($element, $fs, $v, 'time', FALSE);
+    }
+  }
 }
 
 /**
  * Implements hook_date_popup_process_alter().
  */
-function datex_date_popup_process_alter(&$element, &$form_state, $context) {
+function datex_date_popup_process_alter(&$element, &$form_state) {
   if (_datex_is_disabled('popup')) {
     return;
   }
 
   $calendar = _datex_date_field_calendar($element, TRUE);
   if (!$calendar) {
-    return NULL;
+    $calendar = datex_factory(NULL, 'en');
   }
 
   $date_fmt = date_popup_date_format($element);
@@ -170,6 +188,7 @@ function datex_date_popup_process_alter(&$element, &$form_state, $context) {
 
   $has_date_input = $input && isset($input['date']) && !empty($input['date']);
   $has_time_input = $input && isset($input['time']) && !empty($input['time']);
+  $has_default = !empty($element['#default_value']);
 
   // If there is a hidden value, find it
   $hidden_value = $input && isset($input['datex_hidden']) ? $input['datex_hidden'] : '';
@@ -178,10 +197,11 @@ function datex_date_popup_process_alter(&$element, &$form_state, $context) {
   if (empty($hidden_value) &&
     empty($input['date']) &&
     empty($input['time']) &&
-    !empty($element['date']['#default_value'])) {
+    !empty($element['date']['#default_value']) &&
+    $has_default) {
     $calendar->setTimestamp($def->getTimestamp());
-    $element['date']['#default_value'] = $calendar->format($date_fmt);
-    $hidden_value = $calendar->xFormat(DATEX_HIDDEN_VALUE_FMT);
+    $hidden_value = $calendar->getTimestamp();
+    //    $element['date']['#default_value'] = $calendar->format($date_fmt);
   }
 
   // If there was no hidden value but there is date/time value, this is an
@@ -210,8 +230,7 @@ function datex_date_popup_process_alter(&$element, &$form_state, $context) {
   $calendar->setDateLocale($to, 1, 1);
   $to = $calendar->xFormat('U') . '000';
 
-  dpm($from, $to);
-
+  // Not implemented yet.
   $date_fmt = strtr($date_fmt, [
     'd' => 'dd',
     'j' => 'd',
@@ -228,8 +247,22 @@ function datex_date_popup_process_alter(&$element, &$form_state, $context) {
   $parents = array_values($element['#parents']);
   $parents[] = 'datex_hidden';
   $id = 'datex-' . $element['date']['#id'];
-  $init = strlen($hidden_value) === 10 ? $hidden_value . '000' : (time() - 100000000) . '000';
-  $config = "$from|$to|0|0|0|0|0|0|0|0|1|1|persian|day|L|$init";
+  $popup_fmt = 'LL';
+
+  if (strlen($hidden_value) === 10) {
+    $init = $hidden_value . '000';
+  }
+  elseif ($has_default) {
+    $init = $def->getTimestamp() . '000';
+  }
+  else {
+    $init = -1;
+  }
+
+  // See datex.js, you'll know.
+  // The 0s and 1s could be bit flags, but anyway.
+  // This could also be inline js using drupal_add_js, but anyway.
+  $config = "$from|$to|0|0|0|0|0|0|0|0|1|1|persian|day|$popup_fmt|$init";
   $element['datex_hidden'] = [
     '#type' => 'hidden',
     '#title' => 'datex',
@@ -245,8 +278,8 @@ function datex_date_popup_process_alter(&$element, &$form_state, $context) {
   ];
 
   $element['date']['#description'] = '';
-
-  $settings['datex-' . $id] = [
-
-  ];
+  $element['date']['#attributes']['autocomplete'] = 'off';
+  $element['time']['#attributes']['autocomplete'] = 'off';
+  $element['time']['#attributes']['data-datex-init'] = $init;
+  dpm($element);
 }
