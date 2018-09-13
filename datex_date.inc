@@ -5,7 +5,7 @@
  * Provides support for date module.
  */
 
-define('DATEX_HIDDEN_VALUE_FMT', 'Y-n-j H:m:s');
+define('DATEX_HIDDEN_VALUE_FMT', 'U'); //'Y-n-j H:m:s');
 
 // _____________________________________________________________________ HELPER
 
@@ -125,7 +125,7 @@ function _datex_date_field_calendar($element, $check_granularity = TRUE) {
   return datex_factory($tz, _datex_language_calendar(_datex_date_field_schema($element)));
 }
 
-// ------------------------ DON'T ASK
+// ------------------------ DON'T ASK...
 
 function _datex_get_fs(&$element, &$fs, $extra_parent = NULL, $is_input = TRUE) {
   $key = $is_input ? 'input' : 'value';
@@ -358,7 +358,7 @@ function datex_element_info_alter(&$elements) {
     if (isset($elements['date_popup'])) {
       $el = &$elements['date_popup'];
       $validator = isset($el['#element_validate']) ? $el['#element_validate'] : [];
-      $validator = array_merge(['_datex_popup_date_field_element_validate_callback'], $validator);
+      $validator = array_merge(['_datex_date_popup_field_element_validate_callback'], $validator);
       $el['#element_validate'] = $validator;
     }
   }

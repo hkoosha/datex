@@ -1,21 +1,28 @@
 <?php
 
-function _datex_add_lib_cal() {
+
+function _datex_add_lib() {
   static $self_loaded = FALSE;
-  if (!$self_loaded) {
-    $self_loaded = TRUE;
-    $datex_module_path = drupal_get_path('module', 'datex');
-    $min = variable_get('datex_popup_js_min', TRUE) ? '.min' : '';
+  if ($self_loaded) {
+    return;
+  }
+  $self_loaded = TRUE;
 
-    drupal_add_js($datex_module_path . '/asset/datex.js');
-    drupal_add_js($datex_module_path . "/asset/PersianDate/dist/persian-date$min.js");
-    drupal_add_js($datex_module_path . "/asset/pwt.datepicker/dist/js/persian-datepicker$min.js");
+  if (_datex_is_disabled('js')) {
+    return;
+  }
 
-    drupal_add_css($datex_module_path . "/asset/pwt.datepicker/dist/css/persian-datepicker$min.css");
-    $theme = variable_get('datex_pop_js_theme', 'blue');
-    if ($theme) {
-      drupal_add_css($datex_module_path . "/asset/pwt.datepicker/dist/css/theme/persian-datepicker-$theme$min.css");
-    }
+  $datex_module_path = drupal_get_path('module', 'datex');
+  $min = variable_get('datex_popup_js_min', TRUE) ? '.min' : '';
+
+  drupal_add_js($datex_module_path . '/asset/datex.js');
+  drupal_add_js($datex_module_path . "/asset/PersianDate/dist/persian-date$min.js");
+  drupal_add_js($datex_module_path . "/asset/pwt.datepicker/dist/js/persian-datepicker$min.js");
+
+  drupal_add_css($datex_module_path . "/asset/pwt.datepicker/dist/css/persian-datepicker$min.css");
+  $theme = variable_get('datex_pop_js_theme', 'blue');
+  if ($theme) {
+    drupal_add_css($datex_module_path . "/asset/pwt.datepicker/dist/css/theme/persian-datepicker-$theme$min.css");
   }
 }
 
@@ -40,7 +47,7 @@ function datex_js_alter(&$js) {
       if (strpos($each, $unset) !== FALSE) {
         unset($js[$each]);
         // instead use ours
-        _datex_add_lib_cal();
+        _datex_add_lib();
       }
     }
   }
@@ -64,33 +71,144 @@ function datex_css_alter(&$css) {
       if (strpos($each, $unset) !== FALSE) {
         unset($css[$each]);
         // instead use ours
-        _datex_add_lib_cal();
+        _datex_add_lib();
       }
     }
   }
 }
 
-// ----------------------------------------------------------------------------
+// ____________________________________________________________________________
 
-function _datex_popupify(&$element, DatexInterface $calendar, $date_format, $hidden_value) {
+function _datex_popup_node_edit_form_alter() {
+  if (_datex_is_disabled('popup') || !module_exists('date_popup')) {
+    return FALSE;
+  }
+  return TRUE;
+}
+
+function _datex_popup_extract_hidden_element(DatexInterface $calendar, $hidden_value, $g) {
+  try {
+    $hidden_value = substr($hidden_value, 0, 10);
+    $calendar->setTimestamp($hidden_value);
+    $m = in_array('month', $g) ? $calendar->xFormat('n') : 1;
+    $d = in_array('day', $g) ? $calendar->xFormat('j') : 1;
+    $calendar->xSetDate($calendar->xFormat('Y'), $m, $d);
+    return TRUE;
+  } catch (Exception $e) {
+    return FALSE;
+  }
+}
+
+function _datex_date_popup_field_element_validate_callback(&$element, &$fs) {
+  if (date_hidden_element($element) || is_string($element['#value'])) {
+    return;
+  }
+
+  $calendar = _datex_date_field_calendar($element);
+  if (!$calendar) {
+    return;
+  }
+
+  $date_value = _datex_get_fs($element, $fs, 'date');
+  $hidden_value = _datex_get_fs($element, $fs, 'datex_hidden');
+
+  if (empty($date_value)) {
+    // User has cleared date fields value, so clear datex_hidden too.
+    _datex_set_fs($element, $fs, '', 'datex_hidden', TRUE);
+    _datex_set_fs($element, $fs, '', 'datex_hidden', FALSE);
+    return;
+  }
+  elseif (empty($hidden_value)) {
+    // When we have date value, we MUST have datex_hidden value too. If not,
+    // probably the js has failed to work on client side.
+    form_set_error($element['#name'], t('You have to specify a valid date.'));
+    return;
+  }
+
+  $def = date_default_date($element);
+  $date_fmt = date_popup_date_format($element);
+  $g = date_popup_date_granularity($element);
+
+  if (!_datex_popup_extract_hidden_element($calendar, $hidden_value, $g)) {
+    form_set_error($element['#name'], t('Invalid date 0'));
+    return;
+  }
+
+
+  $v = $calendar->xFormat($date_fmt);
+  dpm($v);
+  _datex_set_fs($element, $fs, $v, 'date', TRUE);
+  _datex_set_fs($element, $fs, $v, 'date', FALSE);
+}
+
+/**
+ * Implements hook_date_popup_process_alter().
+ */
+function datex_date_popup_process_alter(&$element, &$form_state, $context) {
   if (_datex_is_disabled('popup')) {
+    return;
+  }
+
+  $calendar = _datex_date_field_calendar($element, TRUE);
+  if (!$calendar) {
     return NULL;
   }
 
-  $schema = _datex_date_field_schema($element);
-  $d = date_default_date($element);
-  if ($d) {
-    $calendar->setTimestamp($d->getTimestamp());
+  $date_fmt = date_popup_date_format($element);
+  $time_fmt = date_popup_time_format($element);
+  $dg = date_popup_date_granularity($element);
+  $tg = date_popup_time_granularity($element);
+  $input = _datex_get_fs($element, $form_state);
+
+  $def = date_default_date($element);
+  if (!in_array('month', $dg)) {
+    $def->setDate($def->format('Y'), 6, $def->format('j'));
   }
-  $def = $calendar->format('Y-n-j');
+  if (!in_array('day', $dg)) {
+    $def->setDate($def->format('Y'), $def->format('n'), 25);
+  }
+
+  $has_date_input = $input && isset($input['date']) && !empty($input['date']);
+  $has_time_input = $input && isset($input['time']) && !empty($input['time']);
+
+  // If there is a hidden value, find it
+  $hidden_value = $input && isset($input['datex_hidden']) ? $input['datex_hidden'] : '';
+
+  // Else, set hidden to default value, if there is no input value.
+  if (empty($hidden_value) &&
+    empty($input['date']) &&
+    empty($input['time']) &&
+    !empty($element['date']['#default_value'])) {
+    $calendar->setTimestamp($def->getTimestamp());
+    $element['date']['#default_value'] = $calendar->format($date_fmt);
+    $hidden_value = $calendar->xFormat(DATEX_HIDDEN_VALUE_FMT);
+  }
+
+  // If there was no hidden value but there is date/time value, this is an
+  // error. They must be already synced, and they are not. probably js on client
+  // side has failed to work.
+  if (!$hidden_value && (!empty($input['date']) || !empty($input['time']))) {
+    form_set_error($element['#name'], t('Invalid date 1'));
+    return;
+  }
+
+  // If user has set any value before, set it again according to hidden_value
+  // the only source of truth.
+  if ($hidden_value && !empty($element['date']['#value'])) {
+    if (!_datex_popup_extract_hidden_element($calendar, $hidden_value, $dg)) {
+      form_set_error($element['#name'], t('Invalid date 2'));
+      return;
+    }
+    $element['date']['#value'] = $calendar->format($date_fmt);
+  }
 
   list($from, $to) = date_range_years($element['#date_year_range']);
   $calendar->xSetDate($from, 1, 1);
-  $from = $calendar->format('Y-n-j');
-  $calendar->xSetDate($to, 1, 1);
-  $to = $calendar->format('Y-n-j');
+  $from = $calendar->xFormat('U') . '000';
+  $calendar->setDateLocale($to, 1, 1);
+  $to = $calendar->xFormat('U') . '000';
 
-  $replace = [
+  $date_fmt = strtr($date_fmt, [
     'd' => 'dd',
     'j' => 'd',
     'l' => 'DD',
@@ -101,142 +219,30 @@ function _datex_popupify(&$element, DatexInterface $calendar, $date_format, $hid
     'M' => 'M',
     'Y' => 'yyyy',
     'y' => 'yy',
-  ];
-  $date_format = strtr($date_format, $replace);
+  ]);
 
-  $s['def'] = $def;
-
-  $p = array_values($element['#parents']);
-  $p[] = 'datex_hidden';
+  $parents = array_values($element['#parents']);
+  $parents[] = 'datex_hidden';
+  $id = 'datex-' . $element['date']['#id'];
+  $init = strlen($hidden_value === 10) ? $hidden_value . '000' : (time() - 100000000) . '000';
+  $config = "$from|$to|0|0|0|0|0|0|0|0|1|1|persian|day|L|$init";
   $element['datex_hidden'] = [
     '#type' => 'hidden',
+    '#title' => 'datex',
     '#value' => $hidden_value,
-    '#parents' => $p,
-    '#attributes' => ['data-datex-findme' => $element['date']['#id']],
+    '#parents' => $parents,
+    '#id' => $id,
+    '#attributes' => [
+      'data-datex-find-me' => $element['date']['#id'],
+      'data-datex-config' => $config,
+      'id' => $id,
+      'class' => $id,
+    ],
   ];
-  foreach ($s as $name => $item) {
-    $element['datex_hidden']['#attributes']['data-datex-' . $name][] = $item;
-  }
+
+  $element['date']['#description'] = '';
+
+  $settings['datex-' . $id] = [
+
+  ];
 }
-
-function _datex_popup_set_hidden_date_on_calendar(DatexInterface $calendar, $hval, $g) {
-  // Year-Month-Day
-  $parts = explode('-', $hval);
-  if (!in_array('month', $g)) {
-    // Month 2 as placeholder (for dates without month granularity) is safer
-    // than 1, when converting back and forth to Gregorian rounding errors
-    // wont cause the year to go back one year accidentally.
-    $parts[1] = 2;
-  }
-  if (!in_array('day', $g)) {
-    // Month 2 as placeholder (for dates without month granularity) is safer
-    // than 1, when converting back and forth to Gregorian rounding errors
-    // wont cause the year to go back one year accidentally.
-    $parts[2] = 2;
-  }
-
-  try {
-    $calendar->setDateLocale($parts[0], $parts[1], $parts[2]);
-  } catch (Exception $e) {
-    return FALSE;
-  }
-  _datex_fix_missing_granularity_locale($calendar, $g);
-  return TRUE;
-}
-
-function _datex_popup_date_field_element_validate_callback(&$element, &$fs) {
-  if (date_hidden_element($element) || is_string($element['#value'])) {
-    return;
-  }
-
-  $calendar = _datex_date_field_calendar($element);
-  if (!$calendar) {
-    return;
-  }
-
-  $dval = _datex_get_fs($element, $fs, 'date');
-  $hval = _datex_get_fs($element, $fs, 'datex_hidden');
-
-  if (empty($dval)) {
-    // User has cleared date fields value, so clear datex_hidden too.
-    _datex_set_fs($element, $fs, '', 'datex_hidden', TRUE);
-    _datex_set_fs($element, $fs, '', 'datex_hidden', FALSE);
-    return;
-  }
-  elseif (empty($hval)) {
-    // When we have date value, we MUST have datex_hidden value too.
-    form_set_error($element['#name'], t('You have to specify a valid date.'));
-    return;
-  }
-
-  $def = date_default_date($element);
-  $date_fmt = date_popup_date_format($element);
-  $g = date_popup_date_granularity($element);
-  _datex_fix_missing_granularity($def, $g, $calendar->getLocaleName());
-
-  if (!_datex_popup_set_hidden_date_on_calendar($calendar, $hval, $g)) {
-    form_set_error($element['#name'], t('Invalid date'));
-    return;
-  }
-
-  $v = $calendar->xFormat($date_fmt);
-  _datex_set_fs($element, $fs, $v, 'date', TRUE);
-  _datex_set_fs($element, $fs, $v, 'date', FALSE);
-}
-
-/**
- * Implements hook_date_popup_process_alter().
- */
-function datex_popup_date_popup_process_alter(&$element, &$form_state, $context) {
-  if (_datex_is_disabled('popup')) {
-    return;
-  }
-
-  $calendar = _datex_date_field_calendar($element, TRUE);
-  if (!$calendar) {
-    return NULL;
-  }
-
-  dpm($element);
-
-  $date_fmt = date_popup_date_format($element);
-  $time_fmt = date_popup_time_format($element);
-  $def = date_default_date($element);
-  $input = _datex_get_fs($element, $form_state);
-  $g = date_popup_date_granularity($element);
-  $hidden_value = '';
-
-  _datex_fix_missing_granularity($def, $g, $calendar->getLocaleName());
-
-  if (!empty($element['date']['#default_value'])) {
-    $calendar->setTimestamp($def->getTimestamp());
-    $element['date']['#default_value'] = $calendar->format($date_fmt);
-    $hidden_value = $calendar->format(DATEX_HIDDEN_VALUE_FMT);
-  }
-
-  if ($input && !empty($input['datex_hidden']) && !empty($element['date']['#value'])) {
-    if (!_datex_popup_set_hidden_date_on_calendar($calendar, $input['datex_hidden'], $g)) {
-      form_set_error($element['#name'], t('Invalid date'));
-      return;
-    }
-    $element['date']['#value'] = $calendar->format($date_fmt);
-    $hidden_value = $input['datex_hidden'];
-  }
-  elseif (!empty($element['date']['#value'])) {
-    if ($def) {
-      $calendar->setTimestamp($def->getTimestamp());
-      $element['date']['#value'] = $calendar->format($date_fmt);
-      $hidden_value = $calendar->format(DATEX_HIDDEN_VALUE_FMT);
-    }
-    else {
-      $element['date']['#value'] = '';
-    }
-  }
-
-  _datex_popupify(
-    $element,
-    $calendar,
-    date_part_format('date', $element['#date_format']),
-    $hidden_value);
-}
-

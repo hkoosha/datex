@@ -268,10 +268,13 @@ function datex_form_alter(&$f, &$fs, $form_id) {
     }
   }
   elseif (isset($f['#node_edit_form'])) {
+    $fs['#datexified'] = TRUE;
     if (_datex_is_disabled('node_edit')) {
       return;
     }
-    $fs['#datexified'] = TRUE;
+    if (_datex_popup_node_edit_form_alter($f, $fs)) {
+      return;
+    }
     $now = $calendar->format('o-m-d H:i:s O');
     if (isset($f['author']['date'])) {
       $t_args = ['%date' => $now];
@@ -315,10 +318,6 @@ function datex_form_alter(&$f, &$fs, $form_id) {
     }
     array_unshift($f['#validate'], '_datex_comment_edit_form_date_validate');
   }
-
-  //  if($form_id === 'views_exposed_form') {
-  //    dpm($f);
-  //  }
 }
 
 // ______________________________________________________________________ TOKEN

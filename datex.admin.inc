@@ -95,15 +95,14 @@ function datex_admin_form($form, $form_state) {
       ' non-patching mode [hook_views_data_alter]'),
     'datex_hook' => t('datex hook, only applicable in patching mode [hook_datex_format_alter]'),
     'token' => t('Tokens [hook_token_info]'),
-    'libraries' => t('Libraries [hook_libraries_info]'),
     'node' => t('Node ("published on" display) [hook_preprocess_node]'),
     'node_edit' => t('Node Edit Form (authored on) [form_alter]'),
     'node_admin' => t('Node admin ("updated" column display)[via hook_form_alter]'),
     'comment' => t('Comment ("published on" display) [hook_preprocess_comment]'),
     'comment_edit' => t('Comment Edit Form (authored on) [form_alter]'),
-    'date' => t('date module (disables date_popup too)'),
-    'popup' => t("date_popup module"),
-    'js' => t("jQuery Calendar (loading the JS library into page) [drupal_add_js/libraries_load]"),
+    'date' => t('date module (disables datex_popup too)'),
+    'popup' => t("datex_popup"),
+    'js' => t("jQuery library (loading the JS library into page) [drupal_add_js/libraries_load]"),
   ];
   $disabled = [];
   foreach (variable_get('datex_disable') as $name => $is_disabled) {
