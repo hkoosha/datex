@@ -203,10 +203,14 @@ function datex_date_popup_process_alter(&$element, &$form_state, $context) {
   }
 
   list($from, $to) = date_range_years($element['#date_year_range']);
+
   $calendar->xSetDate($from, 1, 1);
   $from = $calendar->xFormat('U') . '000';
+
   $calendar->setDateLocale($to, 1, 1);
   $to = $calendar->xFormat('U') . '000';
+
+  dpm($from, $to);
 
   $date_fmt = strtr($date_fmt, [
     'd' => 'dd',
@@ -224,7 +228,7 @@ function datex_date_popup_process_alter(&$element, &$form_state, $context) {
   $parents = array_values($element['#parents']);
   $parents[] = 'datex_hidden';
   $id = 'datex-' . $element['date']['#id'];
-  $init = strlen($hidden_value === 10) ? $hidden_value . '000' : (time() - 100000000) . '000';
+  $init = strlen($hidden_value) === 10 ? $hidden_value . '000' : (time() - 100000000) . '000';
   $config = "$from|$to|0|0|0|0|0|0|0|0|1|1|persian|day|L|$init";
   $element['datex_hidden'] = [
     '#type' => 'hidden',

@@ -2,25 +2,26 @@
  * Attaches the calendar behavior to all date-popup-enabled fields
  */
 (function ($) {
-    function defaultSettings(altField,
-                             minDate,
-                             maxDate,
-                             // -----------------
-                             timeOnly,
-                             hasTime,
-                             // -----------------
-                             hasHour,
-                             hourStep,
-                             hasMinute,
-                             minuteStep,
-                             hasSecond,
-                             secondStep,
-                             // -----------------
-                             hasDay,
-                             hasMonth,
-                             calType,
-                             viewMode,
-                             format
+    function sett(
+        altField,
+        minDate,
+        maxDate,
+        // -----------------
+        timeOnly,
+        hasTime,
+        // -----------------
+        hasHour,
+        hourStep,
+        hasMinute,
+        minuteStep,
+        hasSecond,
+        secondStep,
+        // -----------------
+        hasDay,
+        hasMonth,
+        calType,
+        viewMode,
+        format
     ) {
         return {
             // inline: true,
@@ -126,7 +127,7 @@
         var alt = '#datex-' + id;
         var configStr = $(alt).attr('data-datex-config');
         var c = configStr.split("|");
-        var cfg = defaultSettings(
+        var cfg = sett(
             alt,
             parseInt(c[0]), // min date
             parseInt(c[1]), // max date
@@ -146,7 +147,6 @@
         );
         var init = parseInt(c[15]);
         var pd = who.pDatepicker(cfg);
-        window.pd = pd;
         pd.setDate(init);
 
     }
