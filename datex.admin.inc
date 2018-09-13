@@ -4,6 +4,12 @@
  * Provides administration form for datex module (menu callback).
  */
 function datex_admin_form($form, $form_state) {
+  if (!module_exists('jquery_update')) {
+    drupal_set_message(t('jquery_update is not found, make sure you have' .
+      ' latest version of jquery, else datex_popup will not work and probably' .
+      ' will blow up your website.'), 'warning');
+  }
+
   $schema_options = [];
   foreach (array_keys(variable_get('datex_schema', [])) as $name) {
     $summary = '';
@@ -105,23 +111,29 @@ function datex_admin_form($form, $form_state) {
       $disabled[$name] = $name;
     }
   }
-  $form['disable_individually'] = [
+  $form['devel'] = [
     '#type' => 'fieldset',
-    '#description' => t("Select datex components to be disabled."),
-    '#title' => t('Disable Datex Components'),
+    '#description' => t('Select datex components to be disabled.'),
+    '#title' => t('Development'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
     '#group' => 'datex_config',
   ];
-  $form['disable_individually']['do_not_touch'] = [
+  $form['devel']['do_not_touch'] = [
     '#type' => 'item',
     '#markup' => '<b>' . t('ATTENTION: Dragons ahead! DO NOT select any of these options if you do not know what they do, or you will BREAK your site.') . '</b>',
   ];
-  $form['disable_individually']['datex_disable'] = [
+  $form['devel']['datex_disable'] = [
     '#type' => 'checkboxes',
     '#title' => '',
     '#default_value' => $disabled,
     '#options' => $disablable,
+  ];
+  $form['devel']['datex_popup_js_min'] = [
+    '#type' => 'select',
+    '#title' => t('Use minified js and css'),
+    '#options' => drupal_map_assoc(['min', 'dev']),
+    '#default_value' => variable_get('datex_popup_js_min', TRUE) ? 'min' : 'dev',
   ];
 
   $form['actions']['submit'] = [
@@ -141,7 +153,6 @@ function datex_admin_form($form, $form_state) {
 function _datex_admin_form_submit($form, &$form_state) {
   $v = $form_state['values'];
   variable_set('datex_mode', $v['datex_mode'] == 1 || $v['datex_mode'] == '1' ? 1 : 0);
-  variable_set('datex_popup_js', $v['datex_popup_js']);
 
   $schema = variable_get('datex_schema');
 
@@ -189,6 +200,8 @@ function _datex_admin_form_submit($form, &$form_state) {
     }
     drupal_set_message(t('You must clear the caches for changes to take effect!'), 'warning');
   }
+
+  variable_set('datex_popup_js_min', $v['datex_popup_js_min'] === 'min' ? TRUE : FALSE);
 
   drupal_set_message(t('Configuration saved.'));
 

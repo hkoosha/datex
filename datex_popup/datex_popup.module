@@ -4,7 +4,7 @@ function _datex_add_lib_cal() {
   static $self_loaded = FALSE;
   if (!$self_loaded) {
     $self_loaded = TRUE;
-    $datex_module_path = drupal_get_path('module', 'datex');
+    $datex_module_path = drupal_get_path('module', 'datex_popup');
     $min = variable_get('datex_popup_js_min', TRUE) ? '.min' : '';
 
     drupal_add_js($datex_module_path . '/asset/datex.js');
@@ -24,7 +24,7 @@ function _datex_add_lib_cal() {
  *
  * Whenever date_popup.js is loaded, Remove it and inject datex library.
  */
-function datex_js_alter(&$js) {
+function datex_popup_js_alter(&$js) {
   if (_datex_is_disabled('js')) {
     return;
   }
@@ -49,7 +49,7 @@ function datex_js_alter(&$js) {
 /**
  * Implements hook_css_alter().
  */
-function datex_css_alter(&$css) {
+function datex_popup_css_alter(&$css) {
   if (_datex_is_disabled('js')) {
     return;
   }
@@ -239,4 +239,3 @@ function datex_popup_date_popup_process_alter(&$element, &$form_state, $context)
     date_part_format('date', $element['#date_format']),
     $hidden_value);
 }
-

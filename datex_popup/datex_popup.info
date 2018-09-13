@@ -1,0 +1,9 @@
+name = Datex Popup
+description = Localized date popup for date field, node author form, node scheduler and...
+package = Date/Time
+core = 7.x
+php = 5.4
+
+dependencies[] = datex
+
+configure = admin/config/regional/date-time/datex

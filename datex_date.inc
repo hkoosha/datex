@@ -5,7 +5,7 @@
  * Provides support for date module.
  */
 
-define('DATEX_HIDDEN_VALUE_FMT', 'Y-n-j');
+define('DATEX_HIDDEN_VALUE_FMT', 'Y-n-j H:m:s');
 
 // _____________________________________________________________________ HELPER
 
