@@ -201,7 +201,6 @@ function datex_date_popup_process_alter(&$element, &$form_state) {
     $has_default) {
     $calendar->setTimestamp($def->getTimestamp());
     $hidden_value = $calendar->getTimestamp();
-    //    $element['date']['#default_value'] = $calendar->format($date_fmt);
   }
 
   // If there was no hidden value but there is date/time value, this is an
