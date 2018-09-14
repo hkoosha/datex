@@ -1489,7 +1489,7 @@ var PersianDateClass = function () {
                         {
                             return self.format('MMM YYYY DD   H:m  a');
                         }
-                    //Thursday, September 4th 1986 8:30 PM
+                    //پنج‌شنبه, September 4th 1986 8:30 PM
                     case 'LLLL':
                         {
                             return self.format('dddd D MMMM YYYY  H:m  a');
@@ -3035,17 +3035,17 @@ module.exports = {
     gregorian: {
         months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         monthsShort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        weekdays: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+        weekdays: ['یک‌شنبه', 'دوشنبه', 'سه‌شنبه', 'چهراشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'],
         weekdaysShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
         weekdaysMin: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
     },
     persian: {
-        months: ['Farvardin', 'Ordibehesht', 'Khordad', 'Tir', 'Mordad', 'Shahrivar', 'Mehr', 'Aban', 'Azar', 'Dey', 'Bahman', 'Esfand'],
-        monthsShort: ['Far', 'Ord', 'Kho', 'Tir', 'Mor', 'Sha', 'Meh', 'Aba', 'Aza', 'Dey', 'Bah', 'Esf'],
-        weekdays: ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        months: ['فروردین', 'اردیبهشت', 'خریداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'],
+        monthsShort: ['Far', 'Ord', 'Kho', 'تیر', 'Mor', 'Sha', 'Meh', 'Aba', 'Aza', 'دی', 'Bah', 'Esf'],
+        weekdays: ['شنبه', 'یک‌شنبه', 'دوشنبه', 'سه‌شنبه', 'چهراشنبه', 'پنج‌شنبه', 'جمعه'],
         weekdaysShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
         weekdaysMin: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
-        persianDaysName: ['Urmazd', 'Bahman', 'Ordibehesht', 'Shahrivar', 'Sepandarmaz', 'Khurdad', 'Amordad', 'Dey-be-azar', 'Azar', 'Aban', 'Khorshid', 'Mah', 'Tir', 'Gush', 'Dey-be-mehr', 'Mehr', 'Sorush', 'Rashn', 'Farvardin', 'Bahram', 'Ram', 'Bad', 'Dey-be-din', 'Din', 'Ord', 'Ashtad', 'Asman', 'Zamyad', 'Mantre-sepand', 'Anaram', 'Ziadi']
+        persianDaysName: ['Urmazd', 'بهمن', 'اردیبهشت', 'شهریور', 'Sepandarmaz', 'Khurdad', 'Amordad', 'دی-be-azar', 'آذر', 'آبان', 'Khorshid', 'Mah', 'تیر', 'Gush', 'دی-be-mehr', 'مهر', 'Sorush', 'Rashn', 'فروردین', 'Bahram', 'Ram', 'Bad', 'دی-be-din', 'Din', 'Ord', 'Ashtad', 'Asman', 'Zamyad', 'Mantre-sepand', 'Anaram', 'Ziadi']
     }
 };
 
