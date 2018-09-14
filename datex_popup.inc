@@ -15,14 +15,19 @@ function _datex_add_lib() {
   $datex_module_path = drupal_get_path('module', 'datex');
   $min = variable_get('datex_popup_js_min', TRUE) ? '.min' : '';
 
+  // Disabled for now
+  $min = '';
+
   drupal_add_js($datex_module_path . '/asset/datex.js');
   drupal_add_js($datex_module_path . "/asset/PersianDate/dist/persian-date$min.js");
   drupal_add_js($datex_module_path . "/asset/pwt.datepicker/dist/js/persian-datepicker$min.js");
 
-  drupal_add_css($datex_module_path . "/asset/pwt.datepicker/dist/css/persian-datepicker$min.css");
-  $theme = variable_get('datex_pop_js_theme', 'blue');
-  if ($theme) {
-    drupal_add_css($datex_module_path . "/asset/pwt.datepicker/dist/css/theme/persian-datepicker-$theme$min.css");
+  $theme = variable_get('datex_popup_theme', 'none');
+  if ($theme !== 'none') {
+    drupal_add_css($datex_module_path . "/asset/pwt.datepicker/dist/css/theme/persian-datepicker-$theme.min.css");
+  }
+  else {
+    drupal_add_css($datex_module_path . "/asset/pwt.datepicker/dist/css/persian-datepicker$min.css");
   }
 }
 
@@ -35,7 +40,6 @@ function datex_js_alter(&$js) {
   if (_datex_is_disabled('js')) {
     return;
   }
-
   foreach (array_keys($js) as $each) {
     foreach ([
                'locale.datepicker.js',
@@ -60,7 +64,6 @@ function datex_css_alter(&$css) {
   if (_datex_is_disabled('js')) {
     return;
   }
-
   foreach (array_keys($css) as $each) {
     foreach ([
                'jquery.ui.datepicker.css',
@@ -85,15 +88,6 @@ function _datex_year_to_timestamp(DatexInterface $cal, $greg_year, $want_greg) {
     $cal->setDateLocale($cal->format('Y'), 1, 1);
   }
   return $cal->getTimestamp();
-}
-
-function _datex_popup_node_edit_form_alter() {
-  if (_datex_is_disabled('popup') || !module_exists('date_popup')) {
-    return FALSE;
-  }
-
-  // not supported yet.
-  return FALSE;
 }
 
 function _datex_popup_parse(DatexInterface $calendar, $value, $g) {
@@ -138,7 +132,7 @@ function _datex_date_popup_field_element_validate_callback(&$element, &$fs) {
   $calendar = _datex_date_field_calendar($element);
   if (!$calendar) {
     $calendar = datex_factory();
-    if(!$calendar) {
+    if (!$calendar) {
       $calendar = datex_factory(NULL, 'en');
     }
     $greg = $calendar->getLocaleName() !== 'persian';
@@ -221,7 +215,7 @@ function datex_date_popup_process_alter(&$element, &$fs) {
   $calendar = _datex_date_field_calendar($element);
   if (!$calendar) {
     $calendar = datex_factory();
-    if(!$calendar) {
+    if (!$calendar) {
       $calendar = datex_factory(NULL, 'en');
     }
     $greg = $calendar->getLocaleName() !== 'persian';
@@ -291,5 +285,4 @@ function datex_date_popup_process_alter(&$element, &$fs) {
   elseif (!empty($element['date']['#value'])) {
     $element['date']['#value'] = $calendar->format('Y/n/j');
   }
-
 }

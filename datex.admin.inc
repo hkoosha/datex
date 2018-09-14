@@ -58,6 +58,13 @@ function datex_admin_form($form, $form_state) {
     '#required' => FALSE,
   ];
 
+  $form['datex_popup_theme'] = [
+    '#type' => 'select',
+    '#title' => t('Popup Theme'),
+    '#options' => drupal_map_assoc(['none', 'blue', 'cheerup', 'dark', 'redblack']),
+    '#default_value' => variable_get('datex_popup_theme', 'none'),
+  ];
+
   $form['mode_fieldset'] = [
     '#type' => 'fieldset',
     '#title' => t('Mode'),
@@ -201,6 +208,7 @@ function _datex_admin_form_submit($form, &$form_state) {
   }
 
   variable_set('datex_popup_js_min', $v['datex_popup_js_min'] === 'min' ? TRUE : FALSE);
+  variable_set('datex_popup_theme', $v['datex_popup_theme']);
 
   drupal_set_message(t('Configuration saved.'));
 

@@ -11,7 +11,6 @@ else {
 require_once 'calendar.inc';
 require_once 'datex_date.inc';
 require_once 'datex_popup.inc';
-require_once 'datex.views.inc';
 
 /**
  * Implements hook_menu().
@@ -37,6 +36,77 @@ function datex_menu() {
   ];
   return $items;
 }
+
+/**
+ * Implementation of hook_views_api().
+ */
+function datex_views_api() {
+  return [
+    'api' => 3,
+    'path' => drupal_get_path('module', 'datex'),
+  ];
+}
+
+/**
+ * Implements hook_views_data_alter().
+ */
+function datex_views_data_alter(&$data) {
+  if (_datex_is_disabled('views') || _datex_is_patching_mode()) {
+    return;
+  }
+  foreach ($data as $key => &$value) {
+    if (is_array($value)) {
+      datex_views_data_alter($value);
+    }
+
+    if ($value === 'date_views_argument_handler_simple') {
+      $value = '_datex_date_views_argument_handler_simple';
+    }
+
+    // Field Formatter --------------------------------------------------------
+    $change = [
+      'year',
+      'month',
+      'day',
+      'fulldate',
+      'year_month',
+      'week',
+    ];
+    $change = [
+      'views_handler_field_date',
+      'views_handler_field_last_comment_timestamp',
+      'views_handler_field_history_user_timestamp',
+      'views_handler_field_ncs_last_updated',
+      //      'views_handler_filter_date',
+      //      'views_handler_filter_ncs_last_updated',
+      //      'views_handler_filter_history_user_timestamp',
+    ];
+    if (in_array($value, $change, TRUE)) {
+      $value = '_datex_' . $value;
+    }
+
+    // Contextual filters -----------------------------------------------------
+    $change = [
+      'year',
+      //        'month',
+      //        'day',
+      'fulldate',
+      'year_month',
+      //        'week',
+    ];
+    foreach ([
+               'views_handler_argument_node_created_',
+               'views_handler_argument_node_changed_',
+             ] as $item) {
+      foreach ($change as $g) {
+        if ($value === $item . $g) {
+          $value = '_datex_' . $value;
+        }
+      }
+    }
+  }
+}
+
 
 // ___________________________________________________________________ INTERNAL
 
@@ -270,9 +340,6 @@ function datex_form_alter(&$f, &$fs, $form_id) {
     if (_datex_is_disabled('node_edit')) {
       return;
     }
-    if (_datex_popup_node_edit_form_alter($f, $fs)) {
-      return;
-    }
     $now = $calendar->format('o-m-d H:i:s O');
     if (isset($f['author']['date'])) {
       $t_args = ['%date' => $now];
@@ -280,7 +347,7 @@ function datex_form_alter(&$f, &$fs, $form_id) {
         'Format: %date The date format is YYYY-MM-DD and time is H:i:s. Leave blank to use the time of form submission.', $t_args);
       $f['author']['date']['#element_validate'][] = '_datex_node_edit_form_date_validate';
     }
-    if (isset($f['scheduler_settings'])) {
+    if (isset($f['scheduler_settings']) && !module_exists('date_popup')) {
       foreach (['publish_on', 'unpublish_on'] as $name) {
         if (isset($f['scheduler_settings'][$name])) {
           $f['scheduler_settings'][$name]['#element_validate'][] = '_datex_node_edit_form_date_validate';
@@ -318,126 +385,4 @@ function datex_form_alter(&$f, &$fs, $form_id) {
   }
 }
 
-/**
- * Implements hook_modules_installed().
- *
- * To make sure scheduler uses plain text field, which can be popupified.
- */
-function datex_modules_installed($modules) {
-  if (variable_get('scheduler_field_type', NULL) !== NULL) {
-    variable_set('scheduler_field_type', 'textfield');
-  }
-}
-
 // ______________________________________________________________________ TOKEN
-
-/**
- * Implements hook_token_info().
- *
- * TODO per calendar
- * TODO move this to a file,
- * TODO if possible move the _datex_available_calendars to admin file.
- */
-function datex_token_info() {
-  if (_datex_is_disabled('token')) {
-    return [];
-  }
-
-
-  foreach (_datex_available_calendars() as $cal => $cal_name) {
-    $info['tokens']['datex'][$cal . '_now'] = t('!cal date (now).', ['!cal' => $cal_name]);
-    $calendar = datex_factory(NULL, $cal);
-    $calendar->setTimestamp(REQUEST_TIME);
-  }
-
-  $types['datex'] = [
-    'name' => t("Localized Date (Datex)"),
-    'description' => t(""),
-  ];
-
-  $format = variable_get('date_format_short');
-  $date['short'] = [
-    'name' => t("Short format"),
-    'description' => t("A date in 'short' format. (%date)", ['%date' => $calendar->format($format)]),
-  ];
-
-  $format = variable_get('date_format_medium');
-  $date['medium'] = [
-    'name' => t("Medium format"),
-    'description' => t("A date in 'medium' format. (%date)", ['%date' => $calendar->format($format)]),
-  ];
-
-  $format = variable_get('date_format_long');
-  $date['long'] = [
-    'name' => t("Long format"),
-    'description' => t("A date in 'long' format. (%date)", ['%date' => $calendar->format($format)]),
-  ];
-
-  $date['custom'] = [
-    'name' => t("Custom format"),
-    'description' => t("A date in a custom format and a select calendar. See !php-date for details and check datex for available calendars.", ['!php-date' => l(t('the PHP documentation'), 'http://php.net/manual/en/function.date.php')]),
-    'dynamic' => TRUE,
-  ];
-
-  $tokens = [
-    'types' => $types,
-    'tokens' => [
-      'datex' => $date,
-    ],
-  ];
-
-  return $tokens;
-}
-
-/**
- * Implements hook_tokens().
- */
-// TODO
-function datex_tokens($type, $tokens, array $data = [], array $options = []) {
-  if (_datex_is_disabled('token')) {
-    return [];
-  }
-
-  $replacements = [];
-
-  if ($type == 'datex') {
-    $date = empty($data['date']) ? REQUEST_TIME : $data['date'];
-    $c = datex_factory(NULL, 'persian');
-    $c->setTimestamp($date);
-
-    foreach ($tokens as $name => $original) {
-      switch ($name) {
-        case 'short':
-          $format = variable_get('date_format_short');
-          $replacements[$original] = $c->format($format);
-          break;
-
-        case 'medium':
-          $format = variable_get('date_format_short');
-          $replacements[$original] = $c->format($format);
-          break;
-
-        case 'long':
-          $format = variable_get('date_format_short');
-          $replacements[$original] = $c->format($format);
-          break;
-      }
-    }
-    if ($created_tokens = token_find_with_prefix($tokens, 'custom')) {
-      foreach ($created_tokens as $name => $original) {
-        list($locale, $format) = @explode(':', $name);
-        if (isset($format) && _datex_calendar_is_valid($locale)) {
-          $c = datex_factory(NULL, $locale);
-          $c->setTimestamp($date);
-          $replacements[$original] = $c->format($format);
-        }
-        else {
-          watchdog(WATCHDOG_WARNING, 'Invalid token arguments for datex. Format is not given or requested calerndar is not available. Token replacement ignored.');
-        }
-      }
-    }
-  }
-
-  return $replacements;
-}
-

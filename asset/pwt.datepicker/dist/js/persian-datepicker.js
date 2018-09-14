@@ -3,9 +3,9 @@
 ** Reza Babakhani <babakhani.reza@gmail.com>
 ** http://babakhani.github.io/PersianWebToolkit/docs/datepicker
 ** Under WTFPL license 
-*/ 
+*/
 
-(function ($) {
+(function($){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -824,7 +824,7 @@ var Config = {
          * @type object
          * @default submit
          */
-        en: 'submit'
+        en: 'تایید'
       },
 
       /**
@@ -872,7 +872,7 @@ var Config = {
          * @type object
          * @default today
          */
-        en: 'today'
+        en: 'امروز'
       },
 
       /**

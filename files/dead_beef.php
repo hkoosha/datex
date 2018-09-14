@@ -68,3 +68,114 @@ class _datex_views_handler_filter_date extends views_handler_filter_date {
   }
 
 }
+
+/**
+ * Implements hook_token_info().
+ *
+ * TODO per calendar
+ * TODO move this to a file,
+ * TODO if possible move the _datex_available_calendars to admin file.
+ */
+function datex_token_info() {
+  if (_datex_is_disabled('token')) {
+    return [];
+  }
+
+
+  foreach (_datex_available_calendars() as $cal => $cal_name) {
+    $info['tokens']['datex'][$cal . '_now'] = t('!cal date (now).', ['!cal' => $cal_name]);
+    $calendar = datex_factory(NULL, $cal);
+    $calendar->setTimestamp(REQUEST_TIME);
+  }
+
+  $types['datex'] = [
+    'name' => t("Localized Date (Datex)"),
+    'description' => t(""),
+  ];
+
+  $format = variable_get('date_format_short');
+  $date['short'] = [
+    'name' => t("Short format"),
+    'description' => t("A date in 'short' format. (%date)", ['%date' => $calendar->format($format)]),
+  ];
+
+  $format = variable_get('date_format_medium');
+  $date['medium'] = [
+    'name' => t("Medium format"),
+    'description' => t("A date in 'medium' format. (%date)", ['%date' => $calendar->format($format)]),
+  ];
+
+  $format = variable_get('date_format_long');
+  $date['long'] = [
+    'name' => t("Long format"),
+    'description' => t("A date in 'long' format. (%date)", ['%date' => $calendar->format($format)]),
+  ];
+
+  $date['custom'] = [
+    'name' => t("Custom format"),
+    'description' => t("A date in a custom format and a select calendar. See !php-date for details and check datex for available calendars.", ['!php-date' => l(t('the PHP documentation'), 'http://php.net/manual/en/function.date.php')]),
+    'dynamic' => TRUE,
+  ];
+
+  $tokens = [
+    'types' => $types,
+    'tokens' => [
+      'datex' => $date,
+    ],
+  ];
+
+  return $tokens;
+}
+
+/**
+ * Implements hook_tokens().
+ */
+// TODO
+function datex_tokens($type, $tokens, array $data = [], array $options = []) {
+  if (_datex_is_disabled('token')) {
+    return [];
+  }
+
+  $replacements = [];
+
+  if ($type == 'datex') {
+    $date = empty($data['date']) ? REQUEST_TIME : $data['date'];
+    $c = datex_factory(NULL, 'persian');
+    $c->setTimestamp($date);
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'short':
+          $format = variable_get('date_format_short');
+          $replacements[$original] = $c->format($format);
+          break;
+
+        case 'medium':
+          $format = variable_get('date_format_short');
+          $replacements[$original] = $c->format($format);
+          break;
+
+        case 'long':
+          $format = variable_get('date_format_short');
+          $replacements[$original] = $c->format($format);
+          break;
+      }
+    }
+    if ($created_tokens = token_find_with_prefix($tokens, 'custom')) {
+      foreach ($created_tokens as $name => $original) {
+        list($locale, $format) = @explode(':', $name);
+        if (isset($format) && _datex_calendar_is_valid($locale)) {
+          $c = datex_factory(NULL, $locale);
+          $c->setTimestamp($date);
+          $replacements[$original] = $c->format($format);
+        }
+        else {
+          watchdog(WATCHDOG_WARNING, 'Invalid token arguments for datex. Format is not given or requested calerndar is not available. Token replacement ignored.');
+        }
+      }
+    }
+  }
+
+  return $replacements;
+}
+

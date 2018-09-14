@@ -7,7 +7,7 @@
  * 
  * 
  */
-(function ($) {
+(function($){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -3035,17 +3035,17 @@ module.exports = {
     gregorian: {
         months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         monthsShort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        weekdays: ['یک‌شنبه', 'دوشنبه', 'سه‌شنبه', 'چهراشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'],
-        weekdaysShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-        weekdaysMin: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
-    },
-    persian: {
-        months: ['فروردین', 'اردیبهشت', 'خریداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'],
-        monthsShort: ['Far', 'Ord', 'Kho', 'تیر', 'Mor', 'Sha', 'Meh', 'Aba', 'Aza', 'دی', 'Bah', 'Esf'],
-        weekdays: ['شنبه', 'یک‌شنبه', 'دوشنبه', 'سه‌شنبه', 'چهراشنبه', 'پنج‌شنبه', 'جمعه'],
+        weekdays: ['یک‌شنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'],
         weekdaysShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
         weekdaysMin: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
-        persianDaysName: ['Urmazd', 'بهمن', 'اردیبهشت', 'شهریور', 'Sepandarmaz', 'Khurdad', 'Amordad', 'دی-be-azar', 'آذر', 'آبان', 'Khorshid', 'Mah', 'تیر', 'Gush', 'دی-be-mehr', 'مهر', 'Sorush', 'Rashn', 'فروردین', 'Bahram', 'Ram', 'Bad', 'دی-be-din', 'Din', 'Ord', 'Ashtad', 'Asman', 'Zamyad', 'Mantre-sepand', 'Anaram', 'Ziadi']
+    },
+    persian: {
+        months: ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'],
+        monthsShort: ['فرو', 'ارد', 'خرد', 'تیر', 'مرد', 'شهر', 'مهر', 'آب', 'آذر', 'دی', 'بهم', 'اسف'],
+        weekdays: ['شنبه', 'یک‌شنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه'],
+        weekdaysShort: ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'],
+        weekdaysMin: ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'],
+        persianDaysName: ['Urmazd', 'بهمن', 'اردیبهشت', 'شهریور', 'Sepandarmaz', 'Khurdad', 'Amordad', 'دی-be-azar', 'آذر', 'آبان', 'خردrshid', 'Mah', 'تیر', 'Gush', 'دی-be-mehr', 'مهر', 'Sorush', 'Rashn', 'فروردین', 'بهمram', 'Ram', 'Bad', 'دی-be-din', 'Din', 'ارد', 'Ashtad', 'Asman', 'Zamyad', 'Mantre-sepand', 'Anaram', 'Ziadi']
     }
 };
 

@@ -4,7 +4,6 @@
 (function ($) {
     function sett(minDate, maxDate, hasDay, hasMonth, calType, hasInit) {
         return {
-            // inline: true,
             format: 'L',
             responsive: true,
             persianDigit: false,
@@ -150,9 +149,8 @@
     function processTime(who, settings, id) {
         var hasMin = who.attr('data-datex-has-minute') === "1";
         var cfg = timeSett(settings, hasMin);
-        console.log(cfg)
         var pd = who.pDatepicker(cfg);
-        var init = who.attr('data-datex-init');
+        // var init = who.attr('data-datex-init');
     }
 
     Drupal.behaviors.datex = {
