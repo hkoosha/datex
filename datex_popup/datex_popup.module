@@ -1,5 +1,7 @@
 <?php
 
+require_once 'node.inc';
+
 function datex_popup_enable() {
   if (!module_exists('jquery_update')) {
     drupal_set_message(t("Attention: datex-popup won't work with old versions of jquery. Use jquery_update module."), 'warning');

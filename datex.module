@@ -323,34 +323,53 @@ function datex_form_alter(&$f, &$fs, $form_id) {
   if (!$calendar) {
     return;
   }
+
   if (isset($f['#node_edit_form'])) {
     $fs['#datexified'] = TRUE;
-    $now = $calendar->format('o-m-d H:i:s O');
-    if (isset($f['author']['date'])) {
-      $t_args = ['%date' => $now];
-      $f['author']['date']['#description'] = t(
-        'Format: %date The date format is YYYY-MM-DD and time is H:i:s. Leave blank to use the time of form submission.', $t_args);
-      $f['author']['date']['#element_validate'][] = '_datex_node_edit_form_date_validate';
+    $calendar->xSetDate(2017, 03, 22);
+
+    $calendar->setTimestamp($f['created']['#value']);
+    if (module_exists('datex_popup')) {
+/*      if (isset($f['author']['date'])) {
+        $f['author']['date']['#type'] = 'date_popup';
+        $f['author']['date']['#date_format'] = 'Y/m/d H:i:s';
+        $f['author']['date']['#date_year_range'] = '-100:+100';
+        $f['author']['date']['#date_increment'] = 1;
+      }
+      if (!empty($f['author']['date']['#default_value'])) {
+        $f['author']['date']['#default_value'] = $calendar->xFormat('Y-m-d H:i:s');
+      }
+      $f['author']['date']['#after_build'][] = '_datex_node_edit_form_author_on_date_after_build';
+      $form['#submit'][] = '_datex_authored_node_form_submit';*/
     }
-    if (isset($f['scheduler_settings']) && !module_exists('date_popup')) {
-      foreach (['publish_on', 'unpublish_on'] as $name) {
-        if (isset($f['scheduler_settings'][$name])) {
-          $f['scheduler_settings'][$name]['#element_validate'][] = '_datex_node_edit_form_date_validate';
-        }
-        if (isset($f['#node']->scheduler[$name]) && !empty($f['scheduler_settings'][$name]['#default_value'])) {
-          $calendar->setTimestamp($f['#node']->scheduler[$name]);
-          $f['scheduler_settings'][$name]['#default_value']
-            = $calendar->format('Y-m-d H:i:s O');
-        }
-        $f['scheduler_settings'][$name]['#description'] = t('Format: %date The date format is YYYY-MM-DD and time is H:i:s. Leave blank to disable scheduled.', ['%date' => $now]);
+    else {
+      if (isset($f['author']['date'])) {
+        $f['author']['date']['#element_validate'][] = '_datex_node_edit_form_date_validate';
+        $f['author']['date']['#description'] = t(
+          'Format: %date The date format is YYYY-MM-DD and time is H:i:s.' .
+          ' Leave blank to use the time of form submission.', ['%date' => $calendar->format('Y-n-j H:i:s')]);
+      }
+      if (!empty($f['author']['date']['#default_value'])) {
+        $f['author']['date']['#default_value'] = $calendar->format('Y-m-d H:i:s O');
       }
     }
-    if (!empty($f['author']['date']['#default_value'])) {
-      $calendar->setTimestamp($f['created']['#value']);
-      $f['author']['date']['#default_value'] = $calendar->format('Y-m-d H:i:s O');
+  }
+
+  if (isset($f['scheduler_settings']) && !module_exists('date_popup')) {
+    foreach (['publish_on', 'unpublish_on'] as $name) {
+      if (isset($f['scheduler_settings'][$name])) {
+        $f['scheduler_settings'][$name]['#element_validate'][] = '_datex_node_edit_form_date_validate';
+      }
+      if (isset($f['#node']->scheduler[$name]) && !empty($f['scheduler_settings'][$name]['#default_value'])) {
+        $calendar->setTimestamp($f['#node']->scheduler[$name]);
+        $f['scheduler_settings'][$name]['#default_value']
+          = $calendar->format('Y-m-d H:i:s O');
+      }
+      $f['scheduler_settings'][$name]['#description'] = t('Format: %date The date format is YYYY-MM-DD and time is H:i:s. Leave blank to disable scheduled.', ['%date' => $then]);
     }
   }
-  elseif (isset($f['#id']) && $f['#id'] === 'comment-form' && $f['#entity'] && $f['#entity']->cid) {
+
+  if (isset($f['#id']) && $f['#id'] === 'comment-form' && $f['#entity'] && $f['#entity']->cid) {
     if (!isset($f['#validate'])) {
       $f['#validate'] = [];
     }
@@ -362,4 +381,5 @@ function datex_form_alter(&$f, &$fs, $form_id) {
     }
     array_unshift($f['#validate'], '_datex_comment_edit_form_date_validate');
   }
+
 }
