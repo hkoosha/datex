@@ -1,7 +1,4 @@
-Due to some conflicts with the previous team hereafter I contiue development of
-Datex here. This module is not compatible with the previous date because of 
-namespace conflicts.
-
+WEBFORM, TRANSLATION
 INTRODUCTION
 ------------
 

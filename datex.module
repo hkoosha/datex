@@ -1,16 +1,12 @@
 <?php
 
-if (defined('DATEX_DEBUG')) {
-  define('DATEX_USE_INTL', defined('DATEX_FORCE_DE_INTL')
-    || !class_exists('IntlDateFormatter'));
-}
-else {
-  define('DATEX_USE_INTL', class_exists('IntlDateFormatter'));
-}
+define('DATEX_USE_INTL', class_exists('IntlDateFormatter'));
 
-require_once 'calendar.inc';
+require_once 'src/DatexInterface.php';
+require_once 'src/DatexPartialImplementation.php';
+require_once 'src/DatexIntlCalendar.php';
+require_once 'src/DatexPersianIntlCalendar.php';
 require_once 'datex_date.inc';
-require_once 'datex_popup.inc';
 
 /**
  * Implements hook_menu().
@@ -51,9 +47,6 @@ function datex_views_api() {
  * Implements hook_views_data_alter().
  */
 function datex_views_data_alter(&$data) {
-  if (_datex_is_disabled('views') || _datex_is_patching_mode()) {
-    return;
-  }
   foreach ($data as $key => &$value) {
     if (is_array($value)) {
       datex_views_data_alter($value);
@@ -107,6 +100,14 @@ function datex_views_data_alter(&$data) {
   }
 }
 
+function datex_enable() {
+  if (DATEX_USE_INTL) {
+    return;
+  }
+  require_once 'datex.install';
+  $err = datex_requirements();
+  drupal_set_message(t('warning') . '!!! ' . $err['description'], 'warning');
+}
 
 // ___________________________________________________________________ INTERNAL
 
@@ -128,39 +129,23 @@ function _datex_available_calendars() {
 }
 
 /**
- * Get calendar for a/current language in a mode (if given) from schema.
+ * Get calendar for a/current language from schema.
  *
- * @param string $forSchema
- * @param null $forLang
+ * @param string $for_schema
+ * @param null $for_lang
  *
  * @return null
  */
-function _datex_language_calendar($forSchema = 'default', $forLang = NULL) {
-  if (!$forLang) {
-    $forLang = $GLOBALS['language']->language;
+function _datex_language_calendar($for_schema = 'default', $for_lang = NULL) {
+  if (!$for_lang) {
+    $for_lang = $GLOBALS['language']->language;
   }
   $cfg = variable_get('datex_schema', []);
-  return !isset($cfg[$forSchema][$forLang])
+  return !isset($cfg[$for_schema][$for_lang])
     ? NULL
-    : $cfg[$forSchema][$forLang];
+    : $cfg[$for_schema][$for_lang];
 }
 
-function _datex_is_patching_mode() {
-  return variable_get('datex_mode', 0);
-}
-
-function _datex_is_disabled($name) {
-  $dis = variable_get('datex_disabled');
-  if (!isset($dis['datex'])) {
-    $dis['datex'] = FALSE;
-  }
-  if (!isset($dis[$name])) {
-    $dis[$name] = FALSE;
-  }
-  return $dis['datex'] || $dis[$name];
-}
-
-// TODO move to admin file.
 function _datex_schema_form_options() {
   return [
       'disabled' => t('Disabled'),
@@ -168,45 +153,49 @@ function _datex_schema_form_options() {
     ] + drupal_map_assoc(array_keys(variable_get('datex_schema', [])));
 }
 
-// _______________________________________________________________________ MAIN
-
-/**
- * Implements hook_datex_format_alter().
- *
- * This hook is not available unless Drupal core is patched with provided
- * patch in datex module's directory. If it's not desirable to patch the core
- * (which is usually the case) non-patching mode can be used instead.
- *
- * @param $data
- * @param $context
- */
-function datex_datex_format_alter(&$data, $context) {
-  if (_datex_is_disabled('datex_hook') || !_datex_is_patching_mode()) {
-    return;
+function datex_factory($tz = NULL, $calendar = NULL, $lang_code = NULL) {
+  if (!$calendar) {
+    $calendar = _datex_language_calendar();
+  }
+  if (!$calendar) {
+    return NULL;
+  }
+  if (!$lang_code) {
+    if (count(language_list()) === 1) {
+      $lang_code = 'fa';
+    }
+    else {
+      $lang_code = $GLOBALS['language']->language;
+    }
+  }
+  if (!DATEX_USE_INTL) {
+    switch ($calendar) {
+      case 'persian':
+        require_once 'src/DatexPoorMansJaliliCalendar.php';
+        return new DatexPoorMansJaliliCalendar(is_string($tz) ? timezone_open($tz) : $tz, $lang_code);
+      default:
+        return NULL;
+    }
   }
 
-  $calendar = datex_factory(
-    $context['timezone'],
-    _datex_language_calendar('default', $context['langcode'])
-  );
-  if ($calendar) {
-    $calendar->setTimestamp($context['timestamp']);
-    $data = $calendar->format($context['format']);
+  switch ($calendar) {
+    case 'persian':
+      return new DatexPersianIntlCalendar($tz, $calendar, $lang_code);
+    default:
+      return new DatexIntlCalendar($tz, $calendar, $lang_code);
   }
 }
+
+// _______________________________________________________________________ MAIN
 
 /**
  * Implements hook_preprocess_node().
  *
- * Localizes 'published on' date in non-patching mode.
+ * Localizes 'published on' date.
  *
  * @param $variables
  */
 function datex_preprocess_node(&$variables) {
-  if (_datex_is_disabled('node') || _datex_is_patching_mode()) {
-    return;
-  }
-
   $calendar = datex_factory();
   if (!$calendar) {
     return;
@@ -226,14 +215,11 @@ function datex_preprocess_node(&$variables) {
 /**
  * Implements hook_preprocess_comment().
  *
- * Localizes 'published on' date in non-patching mode.
+ * Localizes 'published on' date.
  *
  * @param $variables
  */
 function datex_preprocess_comment(&$variables) {
-  if (_datex_is_disabled('comment') || _datex_is_patching_mode()) {
-    return;
-  }
   $calendar = datex_factory();
   if (!$calendar) {
     return;
@@ -314,14 +300,10 @@ function _datex_node_edit_form_date_validate($el, &$fs, $f) {
  * @param $form_id
  */
 function datex_form_alter(&$f, &$fs, $form_id) {
-  $calendar = datex_factory();
-  if (!$calendar) {
-    return;
-  }
-
   if ($form_id === 'node_admin_content' && isset($f['admin']['nodes']['#options'])) {
     // Contents list (/admin/content/).
-    if (_datex_is_patching_mode() || _datex_is_disabled('node_admin')) {
+    $calendar = datex_factory();
+    if (!$calendar) {
       return;
     }
     $format = variable_get('date_format_short', '');
@@ -334,12 +316,15 @@ function datex_form_alter(&$f, &$fs, $form_id) {
       $calendar->setTimestamp($date_obj->format('U'));
       $date = $calendar->format($format);
     }
+    return;
   }
-  elseif (isset($f['#node_edit_form'])) {
+
+  $calendar = datex_factory(NULL, NULL, 'en');
+  if (!$calendar) {
+    return;
+  }
+  if (isset($f['#node_edit_form'])) {
     $fs['#datexified'] = TRUE;
-    if (_datex_is_disabled('node_edit')) {
-      return;
-    }
     $now = $calendar->format('o-m-d H:i:s O');
     if (isset($f['author']['date'])) {
       $t_args = ['%date' => $now];
@@ -352,26 +337,20 @@ function datex_form_alter(&$f, &$fs, $form_id) {
         if (isset($f['scheduler_settings'][$name])) {
           $f['scheduler_settings'][$name]['#element_validate'][] = '_datex_node_edit_form_date_validate';
         }
-        // If in patching mode, date is already formatted and localized.
-        if (!_datex_is_patching_mode()) {
-          if (isset($f['#node']->scheduler[$name]) && !empty($f['scheduler_settings'][$name]['#default_value'])) {
-            $calendar->setTimestamp($f['#node']->scheduler[$name]);
-            $f['scheduler_settings'][$name]['#default_value']
-              = $calendar->format('Y-m-d H:i:s O');
-          }
-          $f['scheduler_settings'][$name]['#description'] = t('Format: %date The date format is YYYY-MM-DD and time is H:i:s. Leave blank to disable scheduled.', ['%date' => $now]);
+        if (isset($f['#node']->scheduler[$name]) && !empty($f['scheduler_settings'][$name]['#default_value'])) {
+          $calendar->setTimestamp($f['#node']->scheduler[$name]);
+          $f['scheduler_settings'][$name]['#default_value']
+            = $calendar->format('Y-m-d H:i:s O');
         }
+        $f['scheduler_settings'][$name]['#description'] = t('Format: %date The date format is YYYY-MM-DD and time is H:i:s. Leave blank to disable scheduled.', ['%date' => $now]);
       }
     }
-    if (!_datex_is_patching_mode() && !empty($f['author']['date']['#default_value'])) {
+    if (!empty($f['author']['date']['#default_value'])) {
       $calendar->setTimestamp($f['created']['#value']);
       $f['author']['date']['#default_value'] = $calendar->format('Y-m-d H:i:s O');
     }
   }
   elseif (isset($f['#id']) && $f['#id'] === 'comment-form' && $f['#entity'] && $f['#entity']->cid) {
-    if (_datex_is_disabled('comment_edit')) {
-      return;
-    }
     if (!isset($f['#validate'])) {
       $f['#validate'] = [];
     }
@@ -384,5 +363,3 @@ function datex_form_alter(&$f, &$fs, $form_id) {
     array_unshift($f['#validate'], '_datex_comment_edit_form_date_validate');
   }
 }
-
-// ______________________________________________________________________ TOKEN

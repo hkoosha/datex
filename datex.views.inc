@@ -241,8 +241,7 @@ class _datex_views_handler_field_date extends views_handler_field_date {
       ? $this->options['datex_schema']
       : 'default';
 
-    if (_datex_is_patching_mode()
-      || in_array($this->options['date_format'], self::$parent_handled)
+    if (in_array($this->options['date_format'], self::$parent_handled)
       || $schema === 'disabled') {
       return parent::render($values);
     }
@@ -314,7 +313,7 @@ class _datex_date_views_argument_handler_simple extends views_handler_argument_d
         if (strlen($arg) < 5) {
           return;
         }
-        $calendar->setDateLocale(substr($arg, 0, 4), substr($arg, 4, 6),24);
+        $calendar->setDateLocale(substr($arg, 0, 4), substr($arg, 4, 6), 24);
         $this->argument = $calendar->xFormat('Y-m');
         break;
 

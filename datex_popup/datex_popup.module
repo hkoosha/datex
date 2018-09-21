@@ -1,5 +1,10 @@
 <?php
 
+function datex_popup_enable() {
+  if (!module_exists('jquery_update')) {
+    drupal_set_message(t("Attention: datex-popup won't work with old versions of jquery. Use jquery_update module."), 'warning');
+  }
+}
 
 function _datex_add_lib() {
   static $self_loaded = FALSE;
@@ -8,11 +13,7 @@ function _datex_add_lib() {
   }
   $self_loaded = TRUE;
 
-  if (_datex_is_disabled('js')) {
-    return;
-  }
-
-  $datex_module_path = drupal_get_path('module', 'datex');
+  $datex_module_path = drupal_get_path('module', 'datex_popup');
   $min = variable_get('datex_popup_js_min', TRUE) ? '.min' : '';
 
   // Disabled for now
@@ -36,10 +37,7 @@ function _datex_add_lib() {
  *
  * Whenever date_popup.js is loaded, Remove it and inject datex library.
  */
-function datex_js_alter(&$js) {
-  if (_datex_is_disabled('js')) {
-    return;
-  }
+function datex_popup_js_alter(&$js) {
   foreach (array_keys($js) as $each) {
     foreach ([
                'locale.datepicker.js',
@@ -60,10 +58,7 @@ function datex_js_alter(&$js) {
 /**
  * Implements hook_css_alter().
  */
-function datex_css_alter(&$css) {
-  if (_datex_is_disabled('js')) {
-    return;
-  }
+function datex_popup_css_alter(&$css) {
   foreach (array_keys($css) as $each) {
     foreach ([
                'jquery.ui.datepicker.css',
@@ -135,7 +130,7 @@ function _datex_date_popup_field_element_validate_callback(&$element, &$fs) {
     if (!$calendar) {
       $calendar = datex_factory(NULL, 'en');
     }
-    $greg = $calendar->getLocaleName() !== 'persian';
+    $greg = $calendar->getCalendarName() !== 'persian';
   }
   $date_fmt = date_popup_date_format($element);
   $time_fmt = date_popup_time_format($element);
@@ -206,19 +201,15 @@ function _datex_date_popup_field_element_validate_callback(&$element, &$fs) {
 /**
  * Implements hook_date_popup_process_alter().
  */
-function datex_date_popup_process_alter(&$element, &$fs) {
-  if (_datex_is_disabled('popup')) {
-    return;
-  }
-
+function datex_popup_date_popup_process_alter(&$element, &$fs) {
   $greg = FALSE;
-  $calendar = _datex_date_field_calendar($element);
+  $calendar = _datex_date_field_calendar($element, TRUE, 'en');
   if (!$calendar) {
-    $calendar = datex_factory();
+    $calendar = datex_factory(NULL, NULL, 'en');
     if (!$calendar) {
-      $calendar = datex_factory(NULL, 'en');
+      $calendar = datex_factory(NULL, 'en', 'en');
     }
-    $greg = $calendar->getLocaleName() !== 'persian';
+    $greg = $calendar->getCalendarName() !== 'persian';
   }
   $date_fmt = date_popup_date_format($element);
   $time_fmt = date_popup_time_format($element);
@@ -251,11 +242,11 @@ function datex_date_popup_process_alter(&$element, &$fs) {
     'has-month' => in_array('month', $dg, TRUE),
     'has-day' => in_array('day', $dg, TRUE),
     'value' => $calendar->xFormat('Y-n-j'),
-    'tp' => $calendar->getLocaleName(),
+    'tp' => $calendar->getCalendarName(),
     'init' => $calendar->getTimestamp() . '000',
     'has-minute' => in_array('minute', $tg, TRUE),
   ];
-  if ($calendar->getLocaleName() === 'persian') {
+  if ($calendar->getCalendarName() === 'persian') {
     $element['date']['#description'] = 'Eg 1390/02/24';
     $extra['tp'] = 'persian';
   }
@@ -286,3 +277,4 @@ function datex_date_popup_process_alter(&$element, &$fs) {
     $element['date']['#value'] = $calendar->format('Y/n/j');
   }
 }
+

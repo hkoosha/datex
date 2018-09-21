@@ -13,13 +13,14 @@
  */
 final class DatexPoorMansJaliliCalendar extends DatexPartialImplementation implements DatexInterface {
 
-  public function __construct($tz) {
-    parent::__construct($tz, 'persian');
+  public function __construct($tz, $lang_code) {
+    parent::__construct($tz, 'persian',
+      $lang_code !== 'fa' && $lang_code !== 'en' ? 'fa' : $lang_code);
   }
 
   public function format($format) {
     $tc = ['context' => 'datex'];
-    $names = self::$names;
+    $names = self::$names[$this->langCode];
     $ampm = parent::xFormat('a');
 
     list(
@@ -170,73 +171,150 @@ final class DatexPoorMansJaliliCalendar extends DatexPartialImplementation imple
     ];
   }
 
+  public function copy() {
+    return new DatexPoorMansJaliliCalendar($this->timezone, $this->langCode);
+  }
+
+  public function validate(array $arr) {
+    return NULL;
+  }
+
 
   // ___________________________________________________________________________
 
   private static /** @noinspection SpellCheckingInspection */
     $names = [
-    'months' => [
-      0 => 'Farvardin',
-      1 => 'Ordibehesht',
-      2 => 'Khordad',
-      3 => 'Tir',
-      4 => 'Mordad',
-      5 => 'Shahrivar',
-      6 => 'Mehr',
-      7 => 'Aban',
-      8 => 'Azar',
-      9 => 'Dei',
-      10 => 'Bahman',
-      11 => 'Esfand',
+    'en' => [
+      'months' => [
+        0 => 'Farvardin',
+        1 => 'Ordibehesht',
+        2 => 'Khordad',
+        3 => 'Tir',
+        4 => 'Mordad',
+        5 => 'Shahrivar',
+        6 => 'Mehr',
+        7 => 'Aban',
+        8 => 'Azar',
+        9 => 'Dei',
+        10 => 'Bahman',
+        11 => 'Esfand',
+      ],
+      'ampm' => [
+        'am' => 'Ghablazohr',
+        'pm' => 'Badazohr',
+      ],
+      'day_abbr' => ['sh', 'y', 'd', 's', 'ch', 'p', 'j'],
+      'day_abbr_short' => ['sh', 'y', 'd', 's', 'ch', 'p', 'j'],
+      'day' => [
+        'Shanbe',
+        'Yekshanbe',
+        'Doshanbe',
+        'Seshanbe',
+        'Cheharshanbe',
+        'Panjshanbe',
+        'Jome',
+      ],
+      'order' => [
+        'Yekom',
+        'Dovom',
+        'Sevom',
+        'Cheharom',
+        'Panjom',
+        'Sheshom',
+        'Haftom',
+        'Hashtom',
+        'Nohom',
+        'Dahom',
+        'Yazdahom',
+        'Davazdahom',
+        'Sizdahom',
+        'Chehardahom',
+        'Panzdahom',
+        'Shanzdahom',
+        'Hefdahom',
+        'Hejdahom',
+        'Noozdahom',
+        'Bistom',
+        'Bisto yekom',
+        'Bisto dovom',
+        'Bisto sevom',
+        'Bisto cheharom',
+        'Bisto panjom',
+        'Bisto sheshom',
+        'Bisto haftom',
+        'Bisto hashtom',
+        'Bisto nohom',
+        'Siom',
+        'Sio yekom',
+        'Sio dovom',
+      ],
+
     ],
-    'ampm' => [
-      'am' => 'Ghablazohr',
-      'pm' => 'Badazohr',
-    ],
-    'day_abbr' => ['sh', 'y', 'd', 's', 'ch', 'p', 'j'],
-    'day_abbr_short' => ['sh', 'y', 'd', 's', 'ch', 'p', 'j'],
-    'day' => [
-      'Shanbe',
-      'Yekshanbe',
-      'Doshanbe',
-      'Seshanbe',
-      'Cheharshanbe',
-      'Panjshanbe',
-      'Jome',
-    ],
-    'order' => [
-      'Yekom',
-      'Dovom',
-      'Sevom',
-      'Cheharom',
-      'Panjom',
-      'Sheshom',
-      'Haftom',
-      'Hashtom',
-      'Nohom',
-      'Dahom',
-      'Yazdahom',
-      'Davazdahom',
-      'Sizdahom',
-      'Chehardahom',
-      'Panzdahom',
-      'Shanzdahom',
-      'Hefdahom',
-      'Hejdahom',
-      'Noozdahom',
-      'Bistom',
-      'Bisto yekom',
-      'Bisto dovom',
-      'Bisto sevom',
-      'Bisto cheharom',
-      'Bisto panjom',
-      'Bisto sheshom',
-      'Bisto haftom',
-      'Bisto hashtom',
-      'Bisto nohom',
-      'Siom',
-      'Sio yekom',
-      'Sio dovom',
+    'fa' => [
+      'months' => [
+        0 => 'فروردین',
+        1 => 'اردیبهشت',
+        2 => 'خرداد',
+        3 => 'تیر',
+        4 => 'مرداد',
+        5 => 'شهریور',
+        6 => 'مهر',
+        7 => 'آبان',
+        8 => 'آذر',
+        9 => 'دی',
+        10 => 'بهمن',
+        11 => 'اسفند',
+      ],
+      'ampm' => [
+        'am' => 'قبل‌ازظهر',
+        'pm' => 'بعدازظهر',
+      ],
+      'day_abbr' => ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'],
+      'day_abbr_short' => ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'],
+      'day' => [
+        'شنبه',
+        'یک‌شنبه',
+        'دوشنبه',
+        'سه‌شنبه',
+        'چهارشنبه',
+        'پنج‌شنبه',
+        'جمعه',
+      ],
+      'order' => [
+        'یکم',
+        'دوم',
+        'سوم',
+        'چهارم',
+        'پنجم',
+        'ششم',
+        'هفتم',
+        'هشتم',
+        'نهم',
+        'دهم',
+        'یازدهم',
+        'دوازده‌ام',
+        'سیزده‌ام',
+        'چهارده‌ام',
+        'پانزده‌ام',
+        'شانزده‌ام',
+        'هفده‌ام',
+        'هجده‌ام',
+        'نوزده‌ام',
+        'بیست‌ام',
+        'بیست‌ویکم',
+        'بیست‌ودوم',
+        'بیست‌وسوم',
+        'بیست‌وچهارم',
+        'بیست‌وپنجم',
+        'بیست‌وششم',
+        'بیست‌وهفتم',
+        'بیست‌وهشتم',
+        'بیست‌ونهم',
+        'سی‌ام',
+        'سی‌ویکم',
+        'سی‌ودوم',
+      ],
+
     ],
   ];
 

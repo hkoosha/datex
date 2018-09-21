@@ -4,11 +4,17 @@
  * Provides administration form for datex module (menu callback).
  */
 function datex_admin_form($form, $form_state) {
-  if (!module_exists('jquery_update')) {
-    drupal_set_message(t('jquery_update is not found, make sure you have' .
-      ' latest version of jquery, else datex_popup will not work and probably' .
-      ' will blow up your website.'), 'warning');
-  }
+
+  $form['datex_api_intl_status'] = [
+    '#type' => 'markup',
+    '#title' => t('PHP-Intl status'),
+    '#markup' => !DATEX_USE_INTL
+      ? t("<h1><b><a href='http://php.net/manual/en/book.intl.php'>" .
+        'PHP-Intl</a> is not available in this environment. It is ' .
+        "highly recommended that you enable it, else you'll have limited " .
+        "functionality.</b></h1>")
+      : t('PHP-Intl is available.'),
+  ];
 
   $schema_options = [];
   foreach (array_keys(variable_get('datex_schema', [])) as $name) {
@@ -58,89 +64,27 @@ function datex_admin_form($form, $form_state) {
     '#required' => FALSE,
   ];
 
-  $form['datex_popup_theme'] = [
-    '#type' => 'select',
-    '#title' => t('Popup Theme'),
-    '#options' => drupal_map_assoc(['none', 'blue', 'cheerup', 'dark', 'redblack']),
-    '#default_value' => variable_get('datex_popup_theme', 'none'),
-  ];
+  $form['datex_popup_theme'] = [];
 
-  $form['mode_fieldset'] = [
-    '#type' => 'fieldset',
-    '#title' => t('Mode'),
-    '#collapsible' => !_datex_is_patching_mode() && DATEX_USE_INTL ? TRUE : FALSE,
-    '#collapsed' => !_datex_is_patching_mode() && DATEX_USE_INTL ? TRUE : FALSE,
-  ];
-  $form['mode_fieldset']['datex_api_intl_status'] = [
-    '#type' => 'markup',
-    '#title' => t('PHP-Intl status'),
-    '#markup' => !DATEX_USE_INTL
-      ? t('<b>PHP-Intl is not available in this environment. It is ' .
-        "highly recommended that you enable it, else you'll have limited " .
-        "functionality.</b>")
-      : t('PHP-Intl is available.'),
-  ];
-  $form['mode_fieldset']['datex_mode'] = [
-    '#type' => 'radios',
-    '#title' => t('Date integration mode'),
-    '#default_value' => _datex_is_patching_mode() ? 1 : 0,
-    '#description' => t('The mode which datex uses to integrate with ' .
-      'Drupal. Patching mode needs patching a core file and might be needed ' .
-      'in some rare extreme cases. It is unsafe and dangerous! ' .
-      'It is highly recommended to use non-patching mode.' .
-      "- <b>NOT RECOMMENDED</b>, you've been warned"
-    ),
-    '#options' => [
-      0 => t('Operate in non-patching mode'),
-      1 => t('Operate in patching mode (Patching of the file "common.inc" is required)'),
-    ],
-  ];
-
-  $disablable = [
-    'datex' => t('Datex (globally)'),
-    'views' => t('Views (date field handler, only applicable in' .
-      ' non-patching mode [hook_views_data_alter]'),
-    'datex_hook' => t('datex hook, only applicable in patching mode [hook_datex_format_alter]'),
-    'token' => t('Tokens [hook_token_info]'),
-    'node' => t('Node ("published on" display) [hook_preprocess_node]'),
-    'node_edit' => t('Node Edit Form (authored on) [form_alter]'),
-    'node_admin' => t('Node admin ("updated" column display)[via hook_form_alter]'),
-    'comment' => t('Comment ("published on" display) [hook_preprocess_comment]'),
-    'comment_edit' => t('Comment Edit Form (authored on) [form_alter]'),
-    'date' => t('date module (disables datex_popup too)'),
-    'popup' => t("datex_popup"),
-    'js' => t("jQuery library (loading the JS library into page) [drupal_add_js/libraries_load]"),
-  ];
-  $disabled = [];
-  foreach (variable_get('datex_disable') as $name => $is_disabled) {
-    if ($is_disabled) {
-      $disabled[$name] = $name;
+  if (module_exists('datex_popup')) {
+    if (!module_exists('jquery_update')) {
+      drupal_set_message(t('jquery_update is not found, make sure you have' .
+        ' latest version of jquery, else datex_popup will not work and probably' .
+        ' will blow up your website.'), 'warning');
     }
+    $form['datex_popup_theme'] = [
+      '#type' => 'select',
+      '#title' => t('Popup Theme'),
+      '#options' => drupal_map_assoc([
+        'none',
+        'blue',
+        'cheerup',
+        'dark',
+        'redblack',
+      ]),
+      '#default_value' => variable_get('datex_popup_theme', 'none'),
+    ];
   }
-  $form['devel'] = [
-    '#type' => 'fieldset',
-    '#description' => t('Select datex components to be disabled.'),
-    '#title' => t('Development'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-    '#group' => 'datex_config',
-  ];
-  $form['devel']['do_not_touch'] = [
-    '#type' => 'item',
-    '#markup' => '<b>' . t('ATTENTION: Dragons ahead! DO NOT select any of these options if you do not know what they do, or you will BREAK your site.') . '</b>',
-  ];
-  $form['devel']['datex_disable'] = [
-    '#type' => 'checkboxes',
-    '#title' => '',
-    '#default_value' => $disabled,
-    '#options' => $disablable,
-  ];
-  $form['devel']['datex_popup_js_min'] = [
-    '#type' => 'select',
-    '#title' => t('Use minified js and css'),
-    '#options' => drupal_map_assoc(['min', 'dev']),
-    '#default_value' => variable_get('datex_popup_js_min', TRUE) ? 'min' : 'dev',
-  ];
 
   $form['actions']['submit'] = [
     '#type' => 'submit',
@@ -184,31 +128,9 @@ function _datex_admin_form_submit($form, &$form_state) {
   }
   variable_set('datex_schema', $schema);
 
-  $disabled = variable_get('datex_disable', []);
-  $disable_changed = FALSE;
-  foreach ($v['datex_disable'] as $name => $new_dis_val) {
-    if (!isset($disabled[$name]) || $disabled[$name] != $new_dis_val) {
-      $disabled[$name] = $new_dis_val ? TRUE : FALSE;
-      $disable_changed = TRUE;
-    }
-  };
-  variable_set('datex_disable', $disabled);
-  if ($disable_changed) {
-    $disabled = [];
-    foreach (variable_get('datex_disable') as $name => $is_disabled) {
-      if ($is_disabled) {
-        $disabled[] = $name;
-      }
-    }
-    $disabled = implode(', ', $disabled);
-    if ($disabled) {
-      drupal_set_message(t("Datex components disabled: @c", ['@c' => $disabled]));
-    }
-    drupal_set_message(t('You must clear the caches for changes to take effect!'), 'warning');
+  if (module_exists('datex_popup')) {
+    variable_set('datex_popup_theme', $v['datex_popup_theme']);
   }
-
-  variable_set('datex_popup_js_min', $v['datex_popup_js_min'] === 'min' ? TRUE : FALSE);
-  variable_set('datex_popup_theme', $v['datex_popup_theme']);
 
   drupal_set_message(t('Configuration saved.'));
 

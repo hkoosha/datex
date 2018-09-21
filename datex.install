@@ -15,11 +15,10 @@ function datex_install() {
 
   variable_set('datex_schema', [
     'default' => [
+      'en' => 'persian',
       'fa' => 'persian',
     ],
   ]);
-  variable_set('datex_mode', 0);
-  variable_set('datex_disable', []);
 
   // popup
   variable_set('datex_popup_js_minified', TRUE);
@@ -56,20 +55,6 @@ function datex_requirements() {
       'is required for full support of non-gregorian calendars. Else, datex ' .
       'functionality will be very limited', $intl),
   ];
-  $requirements['datex_popup_jquery'] = [
-    'title' => $t('JQuery Library Version'),
-    'severity' => module_exists('jquery_update') ? REQUIREMENT_OK : REQUIREMENT_INFO,
-    'value' => module_exists('jquery_update') ? $t('jquery_update is enabled') : $t('jquery_update missing'),
-    'description' => $t(
-      'Make sure you have the latest version of library loaded' .
-      ' Use the jquery_update module or any other mean of updating the jquery library.'),
-  ];
 
   return $requirements;
-}
-
-function datex_enable() {
-  if (!module_exists('jquery_update')) {
-    drupal_set_message(t("Attention: datex-popup won't work with old versions of jquery. Use jquery_update module."), 'warning');
-  }
 }
