@@ -5,8 +5,6 @@
  * Fallback calendar implementation in case php-intl is not avaiable.
  */
 
-namespace Drupal\datex\Datex;
-
 /**
  * Jalali calendar for datex.
  *
@@ -545,7 +543,7 @@ final class DatexPoorMansJaliliCalendar extends DatexPartialImplementation imple
           break;
         //Year
         case 'L':
-          $tmpObj = new \DateTime('@' . (time() - 31536000));
+          $tmpObj = new DateTime('@' . (time() - 31536000));
           $v = $tmpObj->format('L');
           break;
         case 'o':

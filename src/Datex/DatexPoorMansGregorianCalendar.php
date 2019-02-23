@@ -5,8 +5,6 @@
  * Fallback calendar implementation in case php-intl is not available.
  */
 
-namespace Drupal\datex\Datex;
-
 final class DatexPoorMansGregorianCalendar extends DatexPartialImplementation implements DatexInterface {
 
   public function __construct($tz, $lang_code) {
@@ -50,7 +48,7 @@ final class DatexPoorMansGregorianCalendar extends DatexPartialImplementation im
   }
 
   public function parse($value, $format) {
-    $dt = \DateTime::createFromFormat($format, $value);
+    $dt = DateTime::createFromFormat($format, $value);
     if (!$dt) {
       return FALSE;
     }

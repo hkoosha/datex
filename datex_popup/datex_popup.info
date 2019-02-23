@@ -1,0 +1,12 @@
+name = Datex Popup
+description = JS Popup Date Picker for Datex.
+package = Date/Time
+core = 7.x
+
+dependencies[] = datex
+dependencies[] = date
+dependencies[] = date_popup
+dependencies[] = jquery_update
+
+configure = admin/config/regional/date-time/datex
+

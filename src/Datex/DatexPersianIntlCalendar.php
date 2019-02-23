@@ -1,11 +1,18 @@
 <?php
 
-namespace Drupal\datex\Datex;
+/**
+ * @file
+ * Persian implementation of DatexInterface.
+ */
 
-use Drupal\datex\DatexFormatter;
-
+/**
+ * Persian implementation of DatexInterface.
+ */
 final class DatexPersianIntlCalendar extends DatexIntlCalendar {
 
+  /**
+   * Check to see if date granularities given in the array are valid dates.
+   */
   function validate(array $arr) {
     if ((!isset($arr['year']) || empty($arr['year'])) &&
       (!isset($arr['month']) || empty($arr['month'])) &&
@@ -28,12 +35,15 @@ final class DatexPersianIntlCalendar extends DatexIntlCalendar {
     return FALSE;
   }
 
+  /**
+   * Creates a clone of this object.
+   */
   function copy() {
     return new DatexPersianIntlCalendar($this->timezone, $this->calendar, $this->langCode);
   }
 
   protected function formatHook($format, $value) {
-    return DatexFormatter::normalize($value);
+    return $value;
   }
 
   function getBaseYear() {

@@ -1,0 +1,8 @@
+name = Datex Webform
+description = Webform date field support.
+package = Date/Time
+core = 7.x
+
+dependencies[] = webform
+dependencies[] = datex
+

@@ -1,7 +1,5 @@
 <?php
 
-namespace Drupal\datex\Datex;
-
 interface DatexInterface {
 
   function xFormat($format);
