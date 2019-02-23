@@ -1,3 +1,6 @@
+This repository is mirror of git@git.drupal.org:project/datex.git
+https://www.drupal.org/project/datex
+
 ### What is Datex
 
 Datex is a zero-configuration, batteries-included, fire-and-forget, zero dependency date localization and internationalization module using php-intl. It is bundled with a popup date picker.
