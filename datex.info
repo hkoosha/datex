@@ -1,6 +1,0 @@
-name = Datex
-description = Localized date for views, node, date field, and...
-package = Date/Time
-core = 7.x
-
-configure = admin/config/regional/date-time/datex

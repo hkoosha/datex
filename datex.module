@@ -1,115 +1,67 @@
 <?php
 
-define('DATEX_USE_INTL', class_exists('IntlDateFormatter'));
+define('DATEX_USE_INTL', FALSE && class_exists('IntlDateFormatter'));
 
-require_once 'src/DatexInterface.php';
-require_once 'src/DatexPartialImplementation.php';
-require_once 'src/DatexIntlCalendar.php';
-require_once 'src/DatexPersianIntlCalendar.php';
-require_once 'datex_date.inc';
+use \Drupal\datex\Datex\DatexPoorMansJaliliCalendar;
+use \Drupal\datex\Datex\DatexPoorMansGregorianCalendar;
+use \Drupal\datex\Datex\DatexPersianIntlCalendar;
+use \Drupal\datex\Datex\DatexIntlCalendar;
 
-/**
- * Implements hook_menu().
- *
- * For admin forms.
- */
-function datex_menu() {
-  $items['admin/config/regional/date-time/datex'] = [
-    'title' => 'Datex',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => ['datex_admin_form'],
-    'access arguments' => ['administer site configuration'],
-    'type' => MENU_LOCAL_TASK,
-    'file' => 'datex.admin.inc',
-  ];
-  $items['admin/config/regional/date-time/datex/edit/%'] = [
-    'title' => 'Datex edit schema',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => ['datex_schema_edit_form', 6],
-    'access arguments' => ['administer site configuration'],
-    'type' => MENU_CALLBACK,
-    'file' => 'datex.admin.inc',
-  ];
-  return $items;
-}
+function datex_factory($tz = NULL, $lang_code = '', $calendar_name = '') {
+  // COPY FROM common.inc::format_date() (drupal 7).
+  static $drupal_static_fast;
+  if (!isset($drupal_static_fast)) {
+    $drupal_static_fast['timezones'] = [];
+  }
+  $timezones = &$drupal_static_fast['timezones'];
 
-/**
- * Implementation of hook_views_api().
- */
-function datex_views_api() {
-  return [
-    'api' => 3,
-    'path' => drupal_get_path('module', 'datex'),
-  ];
-}
-
-/**
- * Implements hook_views_data_alter().
- */
-function datex_views_data_alter(&$data) {
-  foreach ($data as $key => &$value) {
-    if (is_array($value)) {
-      datex_views_data_alter($value);
+  if (!$tz) {
+    $tz = drupal_get_user_timezone();
+  }
+  if (is_string($tz)) {
+    if (!isset($timezones[$tz])) {
+      $timezones[$tz] = timezone_open($tz);
     }
+    $tz = $timezones[$tz];
+  }
 
-    if ($value === 'date_views_argument_handler_simple') {
-      $value = '_datex_date_views_argument_handler_simple';
-    }
-
-    // Field Formatter --------------------------------------------------------
-    $change = [
-      'year',
-      'month',
-      'day',
-      'fulldate',
-      'year_month',
-      'week',
-    ];
-    $change = [
-      'views_handler_field_date',
-      'views_handler_field_last_comment_timestamp',
-      'views_handler_field_history_user_timestamp',
-      'views_handler_field_ncs_last_updated',
-      //      'views_handler_filter_date',
-      //      'views_handler_filter_ncs_last_updated',
-      //      'views_handler_filter_history_user_timestamp',
-    ];
-    if (in_array($value, $change, TRUE)) {
-      $value = '_datex_' . $value;
-    }
-
-    // Contextual filters -----------------------------------------------------
-    $change = [
-      'year',
-      //        'month',
-      //        'day',
-      'fulldate',
-      'year_month',
-      //        'week',
-    ];
-    foreach ([
-               'views_handler_argument_node_created_',
-               'views_handler_argument_node_changed_',
-             ] as $item) {
-      foreach ($change as $g) {
-        if ($value === $item . $g) {
-          $value = '_datex_' . $value;
-        }
-      }
+  if (!$calendar_name) {
+    $for_lang = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    $for_schema = 'default';
+    $cfg = \Drupal::config('datex.schemas')->get($for_schema);
+    $calendar_name = is_array($cfg) && isset($cfg[$for_lang]) ? $cfg[$for_lang] : NULL;
+    if (count(\Drupal::languageManager()->getLanguages()) === 1) {
+      $calendar_name = 'persian';
     }
   }
-}
-
-function datex_enable() {
-  if (DATEX_USE_INTL) {
-    return;
+  if (!$calendar_name) {
+    return NULL;
   }
-  require_once 'datex.install';
-  $err = datex_requirements();
-  drupal_set_message(t('warning') . '!!! ' . $err['description'], 'warning');
-}
 
-// ___________________________________________________________________ INTERNAL
+  if (!$lang_code) {
+    if (count(\Drupal::languageManager()->getLanguages()) === 1) {
+      $lang_code = 'fa';
+    }
+    else {
+      $lang_code = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    }
+  }
+
+  if (!DATEX_USE_INTL) {
+    switch ($calendar_name) {
+      case 'persian':
+        return new DatexPoorMansJaliliCalendar(is_string($tz) ? timezone_open($tz) : $tz, $lang_code);
+      default:
+        return new DatexPoorMansGregorianCalendar(is_string($tz) ? timezone_open($tz) : $tz, $lang_code);
+    }
+  }
+  switch ($calendar_name) {
+    case 'persian':
+      return new DatexPersianIntlCalendar($tz, $calendar_name, $lang_code);
+    default:
+      return new DatexIntlCalendar($tz, $calendar_name, $lang_code);
+  }
+}
 
 /**
  * Calendars supported by PHP-Intl.
@@ -129,257 +81,72 @@ function _datex_available_calendars() {
 }
 
 /**
- * Get calendar for a/current language from schema.
+ * Implements hook_element_info_alter().
  *
- * @param string $for_schema
- * @param null $for_lang
- *
- * @return null
+ * Swap drupal elements with datex elements.
  */
-function _datex_language_calendar($for_schema = 'default', $for_lang = NULL) {
-  if (!$for_lang) {
-    $for_lang = $GLOBALS['language']->language;
-  }
-  $cfg = variable_get('datex_schema', []);
-  return !isset($cfg[$for_schema][$for_lang])
-    ? NULL
-    : $cfg[$for_schema][$for_lang];
-}
-
-function _datex_schema_form_options() {
-  return [
-      'disabled' => t('Disabled'),
-      'default' => t('Default'),
-    ] + drupal_map_assoc(array_keys(variable_get('datex_schema', [])));
-}
-
-function datex_factory($tz = NULL, $calendar = NULL, $lang_code = NULL) {
-  if (!$calendar) {
-    $calendar = _datex_language_calendar();
-  }
-  if (!$calendar) {
-    return NULL;
-  }
-  if (!$lang_code) {
-    if (count(language_list()) === 1) {
-      $lang_code = 'fa';
-    }
-    else {
-      $lang_code = $GLOBALS['language']->language;
-    }
-  }
-  if (!DATEX_USE_INTL) {
-    switch ($calendar) {
-      case 'persian':
-        require_once 'src/DatexPoorMansJaliliCalendar.php';
-        return new DatexPoorMansJaliliCalendar(is_string($tz) ? timezone_open($tz) : $tz, $lang_code);
+function datex_element_info_alter(array &$info) {
+  $rep = function ($find_for) {
+    switch ($find_for) {
+      case \Drupal\Core\Datetime\Element\Datelist::class:
+        $rep = \Drupal\datex\Element\DatexDateList::class;
+        break;
+      case \Drupal\Core\Datetime\Element\Datetime::class:
+        $rep = \Drupal\datex\Element\DatexDateTime::class;
+        break;
+      case \Drupal\Core\Render\Element\Date::class:
+        $rep = \Drupal\datex\Element\DatexDate::class;
+        break;
       default:
-        return NULL;
+        $rep = NULL;
     }
-  }
-
-  switch ($calendar) {
-    case 'persian':
-      return new DatexPersianIntlCalendar($tz, $calendar, $lang_code);
-    default:
-      return new DatexIntlCalendar($tz, $calendar, $lang_code);
-  }
-}
-
-// _______________________________________________________________________ MAIN
-
-/**
- * Implements hook_preprocess_node().
- *
- * Localizes 'published on' date.
- *
- * @param $variables
- */
-function datex_preprocess_node(&$variables) {
-  $calendar = datex_factory();
-  if (!$calendar) {
-    return;
-  }
-  $calendar->setTimestamp($variables['created']);
-
-  $format = variable_get('date_format_medium', 'D, m/d/Y - H:i');
-  $variables['date'] = $calendar->format($format);
-  if (isset($variables['display_submitted'])) {
-    $variables['submitted'] = t('Submitted by !username on !datetime', [
-      '!username' => $variables['name'],
-      '!datetime' => $variables['date'],
-    ]);
+    return $rep;
+  };
+  foreach (['date', 'datelist', 'datetime'] as $el_) {
+    if (!isset($info[$el_])) {
+      continue;
+    }
+    $el = &$info[$el_];
+    if ($el_ === 'date' || $el_ === 'datetime') {
+      $el['#attached']['library'][] = 'datex/picker';
+    }
+    foreach ([
+               '#process',
+               '#pre_render',
+               '#element_validate',
+               '#value_callback',
+             ] as $attr_) {
+      if (!isset($el[$attr_])) {
+        continue;
+      }
+      foreach ($el[$attr_] as $ai => &$a) {
+        if (is_array($a)) {
+          $a[0] = $rep($a[0]) ?: $a[0];
+        }
+        else {
+          $el[$attr_][$ai] = $rep($a) ?: $a;
+        }
+      }
+    }
   }
 }
 
 /**
- * Implements hook_preprocess_comment().
- *
- * Localizes 'published on' date.
- *
- * @param $variables
+ * Implements hook_field_widget_info_alter().
  */
-function datex_preprocess_comment(&$variables) {
-  $calendar = datex_factory();
-  if (!$calendar) {
-    return;
+function datex_field_widget_info_alter(&$info) {
+  $info['datetime_default']['class'] = \Drupal\datex\Plugin\Field\FieldWidget\DatexDateTimeDefaultWidget::class;
+  $info['datetime_datelist']['class'] = \Drupal\datex\Plugin\Field\FieldWidget\DatexDateTimeDatelistWidget::class;
+  $info['datetime_timestamp']['class'] = \Drupal\datex\Plugin\Field\FieldWidget\DatexTimestampDatetimeWidget::class;
+  if (isset($info['datetime_timestamp_no_default'])) {
+    $info['datetime_timestamp_no_default']['class'] = \Drupal\datex\Plugin\Field\FieldWidget\DatexTimestampDatetimeNoDefaultWidget::class;
   }
-
-  $calendar->setTimestamp($variables['elements']['#comment']->created);
-
-  // Timestamp set while calling factory.
-  $fmt = variable_get('date_format_medium', '');
-  $variables['changed'] = $calendar->format($fmt);
-  $calendar->setTimestamp($variables['elements']['#comment']->created);
-  $variables['created'] = $calendar->format($fmt);
-  $variables['submitted'] = t('Submitted by !username on !datetime', [
-    '!username' => $variables['author'],
-    '!datetime' => $variables['created'],
-  ]);
-}
-
-function _datex_comment_edit_form_date_validate($f, &$fs) {
-  $calendar = datex_factory();
-  if (!$calendar) {
-    return;
+  foreach ([
+             'default',
+             'datelist',
+             'timestamp',
+             'datetime_timestamp_no_default',
+           ] as $item) {
+    $info["datetime_$item"]['provider'] = 'datex';
   }
-
-  if (!isset($fs['values']['date'])) {
-    return;
-  }
-
-  $date = &$fs['values']['date'];
-
-  $m = [];
-  $pattern = '#^([0-9]{2,4})[-\/\\\]([0-9]{1,2})[-\/\\\]([0-9]{1,2})( {1,}([0-9]{1,2})\:([0-9]{1,2}))?#';
-  $ok = preg_match($pattern, $date, $m);
-  if ($ok && count($m) == 7) {
-    $calendar->setDateLocale($m[1], $m[2], $m[3]);
-    $calendar->setTime($m[5], $m[6], 0);
-    $date = $calendar->xFormat('Y-m-d H:i:s O');
-  }
-  else {
-    form_set_error('date', t('Invalid date'));
-  }
-}
-
-function _datex_node_edit_form_date_validate($el, &$fs, $f) {
-  if (!$fs['#datexified'] || empty($el['#value'])) {
-    return;
-  }
-
-  $calendar = datex_factory();
-  if (!$calendar) {
-    form_set_error($el['#name'], t('Invalid site language.'));
-  }
-
-  $m = [];
-  $pattern = '#^([0-9]{2,4})[-\/\\\]([0-9]{1,2})[-\/\\\]([0-9]{1,2})( {1,}([0-9]{1,2})\:([0-9]{1,2})\:([0-9]{1,2}))?#';
-  $ok = preg_match($pattern, $el['#value'], $m);
-  if ($ok && count($m) == 8) {
-    $calendar->setDateLocale($m[1], $m[2], $m[3]);
-    $calendar->setTime($m[5], $m[6], $m[7]);
-    $el['#value'] = $calendar->xFormat('Y-m-d H:i:s O');
-    form_set_value($el, $el['#value'], $fs);
-  }
-  else {
-    form_set_error($el['#name'], t('You have to specify a valid date.'));
-  }
-}
-
-/**
- * Implements hook_form_alter().
- *
- * Modules to support:
- *  - Scheduler
- *  - translation date
- *  - views exposed forms
- *
- * @param $f
- * @param $fs
- * @param $form_id
- */
-function datex_form_alter(&$f, &$fs, $form_id) {
-  if ($form_id === 'node_admin_content' && isset($f['admin']['nodes']['#options'])) {
-    // Contents list (/admin/content/).
-    $calendar = datex_factory();
-    if (!$calendar) {
-      return;
-    }
-    $format = variable_get('date_format_short', '');
-    if (!$format) {
-      return;
-    }
-    foreach ($f['admin']['nodes']['#options'] as &$node) {
-      $date = &$node['changed'];
-      $date_obj = date_create_from_format($format, $date);
-      $calendar->setTimestamp($date_obj->format('U'));
-      $date = $calendar->format($format);
-    }
-    return;
-  }
-
-  $calendar = datex_factory(NULL, NULL, 'en');
-  if (!$calendar) {
-    return;
-  }
-
-  if (isset($f['#node_edit_form'])) {
-    $fs['#datexified'] = TRUE;
-    $calendar->xSetDate(2017, 03, 22);
-
-    $calendar->setTimestamp($f['created']['#value']);
-    if (module_exists('datex_popup')) {
-/*      if (isset($f['author']['date'])) {
-        $f['author']['date']['#type'] = 'date_popup';
-        $f['author']['date']['#date_format'] = 'Y/m/d H:i:s';
-        $f['author']['date']['#date_year_range'] = '-100:+100';
-        $f['author']['date']['#date_increment'] = 1;
-      }
-      if (!empty($f['author']['date']['#default_value'])) {
-        $f['author']['date']['#default_value'] = $calendar->xFormat('Y-m-d H:i:s');
-      }
-      $f['author']['date']['#after_build'][] = '_datex_node_edit_form_author_on_date_after_build';
-      $form['#submit'][] = '_datex_authored_node_form_submit';*/
-    }
-    else {
-      if (isset($f['author']['date'])) {
-        $f['author']['date']['#element_validate'][] = '_datex_node_edit_form_date_validate';
-        $f['author']['date']['#description'] = t(
-          'Format: %date The date format is YYYY-MM-DD and time is H:i:s.' .
-          ' Leave blank to use the time of form submission.', ['%date' => $calendar->format('Y-n-j H:i:s')]);
-      }
-      if (!empty($f['author']['date']['#default_value'])) {
-        $f['author']['date']['#default_value'] = $calendar->format('Y-m-d H:i:s O');
-      }
-    }
-  }
-
-  if (isset($f['scheduler_settings']) && !module_exists('date_popup')) {
-    foreach (['publish_on', 'unpublish_on'] as $name) {
-      if (isset($f['scheduler_settings'][$name])) {
-        $f['scheduler_settings'][$name]['#element_validate'][] = '_datex_node_edit_form_date_validate';
-      }
-      if (isset($f['#node']->scheduler[$name]) && !empty($f['scheduler_settings'][$name]['#default_value'])) {
-        $calendar->setTimestamp($f['#node']->scheduler[$name]);
-        $f['scheduler_settings'][$name]['#default_value']
-          = $calendar->format('Y-m-d H:i:s O');
-      }
-      $f['scheduler_settings'][$name]['#description'] = t('Format: %date The date format is YYYY-MM-DD and time is H:i:s. Leave blank to disable scheduled.', ['%date' => $then]);
-    }
-  }
-
-  if (isset($f['#id']) && $f['#id'] === 'comment-form' && $f['#entity'] && $f['#entity']->cid) {
-    if (!isset($f['#validate'])) {
-      $f['#validate'] = [];
-    }
-    if (isset($f['author']['date'])) {
-      $fmt = 'Y-m-d H:i O';
-      $date_obj = date_create_from_format($fmt, $f['author']['date']['#default_value']);
-      $calendar->setTimestamp($date_obj->format('U'));
-      $f['author']['date']['#default_value'] = $calendar->format($fmt);
-    }
-    array_unshift($f['#validate'], '_datex_comment_edit_form_date_validate');
-  }
-
 }
